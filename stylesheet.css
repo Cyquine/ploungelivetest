@@ -38,10 +38,66 @@ p {
 .load {
     height: 30px;
     width: 30px;
+<<<<<<< HEAD
+    margin-top: -5px;
+    padding: 0;
+=======
+>>>>>>> eb6e54a69af3d0e0fa9a015e0e43a1bbe143b216
     border: 0;
     background: none;
     float: left;
     text-align: center;
+}
+
+.load.parent {
+    transform: rotate(90deg);
+}
+
+.load-segment {
+    height: 4px;
+    width: 16px;
+    position: absolute;
+    transform-origin: 0 0;
+}
+
+.load-tl {
+    margin-left: -14px;
+    transform: rotate(-45deg);
+}
+
+.load-tr {
+    margin-top: -14px;
+    transform: rotate(45deg);
+    animation-delay: 0.25s;
+}
+
+.load-br {
+    margin-left: 14px;
+    background-image: linear-gradient(to right, transparent 25%, #888 25%);
+    transform: rotate(135deg);
+    animation-delay: -0.5s;
+}
+
+.load-bl {
+    margin-top: 14px;
+    background-color: #888;
+    transform: rotate(225deg);
+    animation-delay: -0.25s;
+}
+
+.loading {
+    background-color: transparent;
+    background-image: linear-gradient(to right, transparent 25%, #888 50%); 
+    background-size: 400%;
+    animation-name: load;
+    animation-duration: 1s;
+    animation-timing-function: linear;
+    animation-iteration-count: infinite;
+}
+
+@keyframes load {
+    0% {background-position: 0}
+    100% {background-position: 64px}
 }
 
 .comment {
@@ -49,8 +105,9 @@ p {
 }
 
 .comment-header {
+    box-sizing: border-box;
     background-color: #DDD;
-    padding: 10px 0;
+    padding: 10px;
     width: 100%;
 }
 
@@ -65,4 +122,16 @@ p {
 
 .link {
     margin: 0 0 5px;
+}
+
+.permalink {
+    height: 30px;
+    width: 30px;
+    display: inline-block;
+    margin: -5px 5px 0 5px;
+    opacity: 0.5;
+    background-image: url(https://www.redditstatic.com/about/assets/reddit-alien-small.png);
+    background-repeat: no-repeat;
+    background-size: cover;
+    float: left;
 }

@@ -1,7 +1,17 @@
+/* As a reminder for style:
+ * https://github.com/necolas/idiomatic-css
+ */
+
+/* General selectors */
+
 body {
-    background-color: #DDF;
-    font-family: verdana, arial;
     padding: 10px;
+    background-color: #ddf;
+    font-family: verdana, arial;
+}
+
+p {
+    margin: 0;
 }
 
 a {
@@ -10,26 +20,24 @@ a {
 
 blockquote {
     margin: 10px;
-    padding-left: 4px;
     border-left: 2px #369 solid;
-}
-
-p {
-    margin: 0;
+    padding-left: 4px;
 }
 
 button {
-    padding: 0;
     border: 0;
+    padding: 0;
     background: none;
-}   
+}
+
+/* Macro elements */ 
 
 #more, #footer {
-    background-color: #FFF;
     border: none;
     padding: 5px;
     width: 100%;
     box-sizing: border-box;
+    background-color: #fff;
     text-align: center;
 }
 
@@ -47,8 +55,8 @@ button {
 
 .faded-out {
     opacity: 0;
-    transition: opacity 0.25s;
     pointer-events: none;
+    transition: opacity 0.25s;
 }
 
 .faded-in {
@@ -56,17 +64,59 @@ button {
     transition: opacity 0.25s;
 }
 
+/* Submission */
+
 .submission {
-    background-color: #EEE;
     margin: 10px 0;
     padding: 10px;
+    background-color: #eee;
 }
 
-.load {
+/* Comment */
+
+.comment {
+    background-color: #fff;
+}
+
+.comment-header {
+    padding: 10px;
+    width: 100%;
+    box-sizing: border-box;
+    background-color: #ddd;
+}
+
+.link {
+    margin: 0 0 5px;
+}
+
+.permalink {
+    float: left;
+    margin: -5px 5px 0 5px;
+    display: inline-block;
     height: 30px;
     width: 30px;
-    margin-top: -5px;
+    background-image: url(https://www.redditstatic.com/about/assets/reddit-alien-small.png);
+    background-repeat: no-repeat;
+    background-size: cover;
+    opacity: 0.5;
+}
+
+.created {
+    padding-left: 10px;
+}
+
+.md {
+    margin: 10px 10px 0;
+    padding-bottom: 10px;
+}
+
+/* Loading icon */
+
+.load {
     float: left;
+    margin-top: -5px;
+    height: 30px;
+    width: 30px;
     text-align: center;
 }
 
@@ -75,10 +125,10 @@ button {
 }
 
 .load-segment {
-    height: 4px;
-    width: 16px;
     position: absolute;
     transform-origin: 0 0;
+    height: 4px;
+    width: 16px;
 }
 
 .load-tl {
@@ -94,15 +144,15 @@ button {
 
 .load-br {
     margin-left: 14px;
-    background-image: linear-gradient(to right, transparent 25%, #888 25%);
     transform: rotate(135deg);
+    background-image: linear-gradient(to right, transparent 25%, #888 25%);
     animation-delay: -0.5s;
 }
 
 .load-bl {
     margin-top: 14px;
-    background-color: #888;
     transform: rotate(225deg);
+    background-color: #888;
     animation-delay: -0.25s;
 }
 
@@ -119,40 +169,4 @@ button {
 @keyframes load {
     0% {background-position: 0}
     100% {background-position: 64px}
-}
-
-.comment {
-    background-color: #FFF;
-}
-
-.comment-header {
-    box-sizing: border-box;
-    background-color: #DDD;
-    padding: 10px;
-    width: 100%;
-}
-
-.md {
-    margin: 10px 10px 0;
-    padding-bottom: 10px;
-}
-
-.created {
-    padding-left: 10px;
-}
-
-.link {
-    margin: 0 0 5px;
-}
-
-.permalink {
-    height: 30px;
-    width: 30px;
-    display: inline-block;
-    margin: -5px 5px 0 5px;
-    opacity: 0.5;
-    background-image: url(https://www.redditstatic.com/about/assets/reddit-alien-small.png);
-    background-repeat: no-repeat;
-    background-size: cover;
-    float: left;
 }

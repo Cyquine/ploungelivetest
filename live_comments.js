@@ -117,8 +117,9 @@ function list() {
     var wrapper = document.getElementById('content');
     wrapper.insertBefore(parent, wrapper.firstChild);
 
-    document.getElementById('hide').textContent = 'Hide ' +
-                                          Math.min(wrapper.children.length, 25);
+    var hide_button = document.getElementById('hide');
+    hide_button.textContent = 'Hide ' + Math.min(wrapper.children.length, 25);
+    hide_button.setAttribute('class', 'faded-in');
 
 }
 list.comments = [];

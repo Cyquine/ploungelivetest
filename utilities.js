@@ -33,16 +33,16 @@ function show() {
         i++) wrapper.appendChild(show.hidden.shift());
 
     var show_button = document.getElementById('show'),
-        more_comments = document.getElementById('more-comments'),
+        hidden_comments = document.getElementById('hidden-comments'),
         hide_button = document.getElementById('hide'),
         hidden = show.hidden.length;
 
     if (hidden === 0) {
         show_button.setAttribute('class', 'faded-out');
-        more_comments.textContent = 'No more comments';
+        hidden_comments.textContent = 'No hidden comments';
     } else {
         show_button.textContent = 'Show ' + Math.min(hidden, 25);
-        more_comments.textContent = hidden + ' more comment' + (hidden>1?'s':'');
+        hidden_comments.textContent = hidden + ' hidden comment' + (hidden > 1 ? 's' : '');
     }
 
     hide_button.textContent = 'Hide ' + Math.min(wrapper.children.length, 25);
@@ -70,6 +70,6 @@ function hide() {
     if (wrapper.children.length === 0) hide_button.setAttribute('class', 'faded-out');
     else hide_button.textContent = 'Hide ' + Math.min(wrapper.children.length, 25);
 
-    document.getElementById('more-comments').textContent = hidden +
-                                      ' more comment' + (hidden > 1 ? 's' : '');
+    document.getElementById('hidden-comments').textContent = hidden +
+                                    ' hidden comment' + (hidden > 1 ? 's' : '');
 }

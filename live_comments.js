@@ -6,29 +6,23 @@ var LAST_CALL = 0,
 document.getElementById('more').onclick = list;
 
 function getComments() {
-    clearTimeout(NEXT_CALL_TIMEOUT);
-
-    var param_string = [];
-    for (var param in getComments.params) {
-        param_string.push(param + '=' + getComments.params[param]);
-    }
-
     var script = document.createElement('script');
-    script.src = 'https://www.reddit.com/r/mlplounge/comments.json?' +
-                                                         param_string.join('&');
+    script.src = 'https://www.reddit.com/r/mlplounge/comments.json?jsonp=more&before='
+                 + getComments.before;
     document.body.appendChild(script);
     LAST_CALL = Date.now();
     document.body.removeChild(script);
 }
-getComments.params = {'jsonp': 'more'};
+getComments.before = '';
 getComments();
 
-function more(raw) {
+function more(data) {
+    new_comments = Array.prototype.unshift.apply(list.comments,
+                                                      data['data']['children']);
     if (document.getElementById('content').childNodes.length === 0) {
-        list.raw = raw;
         list();
-    } else if ((new_comments = raw['data']['children'].length) > 0) {
-        list.raw = raw;
+    } else if (new_comments > 0) {
+        getComments.before = list.comments[0]['data']['name'];
         var button = document.getElementById('more');
         button.textContent = new_comments + ' new comment' +
                                                 (new_comments === 1 ? '' : 's');
@@ -39,8 +33,8 @@ function more(raw) {
 
 function list() {
     document.getElementById('more').className = 'fadedout';
-    var comments = list.raw['data']['children'];
-    list.raw = {};
+    var comments = list.comments;
+    list.comments = {};
     var parent = document.createDocumentFragment();
 
     for (var i = 0; i < comments.length; i++) {
@@ -121,9 +115,8 @@ function list() {
 
     var wrapper = document.getElementById('content');
     wrapper.insertBefore(parent, wrapper.firstChild);
-
-    getComments.params['before'] = comments[0]['data']['name'];
 }
+list.comments = [];
 
 function timestamp(el, created) { // sets live timestamp, then sleeps again
     var age = Date.now() - created;

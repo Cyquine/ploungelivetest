@@ -5,14 +5,9 @@ var LAST_CALL = 0,
 
 function getComments() {
     var script = document.createElement('script');
-<<<<<<< HEAD
     script.setAttribute('src',
          'https://www.reddit.com/r/mlplounge/comments.json?jsonp=more&before=' +
                                                             getComments.before);
-=======
-    script.src = 'https://www.reddit.com/r/mlplounge/comments.json?jsonp=more&before='
-                 + getComments.before;
->>>>>>> eb6e54a69af3d0e0fa9a015e0e43a1bbe143b216
     document.body.appendChild(script);
     LAST_CALL = Date.now();
     document.body.removeChild(script);
@@ -24,31 +19,23 @@ function more(data) {
     new_comments = Array.prototype.unshift.apply(list.comments,
                                                       data['data']['children']);
     if (document.getElementById('content').childNodes.length === 0) {
-<<<<<<< HEAD
         getComments.before = list.comments[0]['data']['name'];
-=======
->>>>>>> eb6e54a69af3d0e0fa9a015e0e43a1bbe143b216
         list();
     } else if (new_comments > 0) {
         getComments.before = list.comments[0]['data']['name'];
         var button = document.getElementById('more');
         button.textContent = new_comments + ' new comment' +
                                                 (new_comments === 1 ? '' : 's');
-        button.className = 'fadedin';       
+        button.setAttribute('class', 'fadedin');       
     }
     setTimeout(getComments, 2000);
 }
 
 function list() {
     var comments = list.comments;
-    list.comments = {};
-    document.getElementById('more').className = 'fadedout';
-<<<<<<< HEAD
-=======
-    var comments = list.comments;
-    list.comments = {};
-    var parent = document.createDocumentFragment();
->>>>>>> eb6e54a69af3d0e0fa9a015e0e43a1bbe143b216
+    list.comments = [];
+
+    document.getElementById('more').setAttribute('class', 'fadedout');
 
     var parent = document.createDocumentFragment();
     for (var i = 0; i < comments.length; i++) {

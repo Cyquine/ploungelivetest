@@ -1,5 +1,3 @@
-function div(a, b) {return (a-a%b)/b} // integer division
-
 var LAST_CALL = 0,
     NEXT_CALL_TIMEOUT = setTimeout(undefined);
 
@@ -18,15 +16,15 @@ getComments();
 function more(data) {
     new_comments = Array.prototype.unshift.apply(list.comments,
                                                       data['data']['children']);
-    if (document.getElementById('content').childNodes.length === 0) {
+    if (getComments.before === '') {
         getComments.before = list.comments[0]['data']['name'];
         list();
     } else if (new_comments > 0) {
         getComments.before = list.comments[0]['data']['name'];
-        var button = document.getElementById('more');
-        button.textContent = new_comments + ' new comment' +
+        var more_button = document.getElementById('more');
+        more_button.textContent = new_comments + ' new comment' +
                                                 (new_comments === 1 ? '' : 's');
-        button.setAttribute('class', 'fadedin');       
+        more_button.setAttribute('class', 'faded-in');       
     }
     setTimeout(getComments, 2000);
 }
@@ -35,7 +33,7 @@ function list() {
     var comments = list.comments;
     list.comments = [];
 
-    document.getElementById('more').setAttribute('class', 'fadedout');
+    document.getElementById('more').setAttribute('class', 'faded-out');
 
     var parent = document.createDocumentFragment();
     for (var i = 0; i < comments.length; i++) {
@@ -88,9 +86,8 @@ function list() {
         var permalink = document.createElement('a');
         permalink.setAttribute('class', 'permalink');
         permalink.setAttribute('target', '_blank');
-        permalink.setAttribute('href',
-                    ['https://www.reddit.com/r/MLPLounge/comments', 
-                    c['link_id'].slice(3), c['link_title'], c['id']].join('/'));
+        permalink.setAttribute('href', 'https://www.reddit.com/r/MLPLounge/' +
+                         'comments/' + c['link_id'].slice(3) + '/x/' + c['id']);
 
         var comment_header = document.createElement('div');
         comment_header.appendChild(load_parent);
@@ -109,45 +106,22 @@ function list() {
         submission.appendChild(load_submission);
         submission.appendChild(link);
         submission.appendChild(comment);
-        submission.setAttribute('class', 'submission fadedout');
+        submission.setAttribute('class', 'submission faded-out');
 
         parent.appendChild(submission);
 
-        setTimeout(function (el) {el.className = 'submission fadedin'},
-            100*(Math.min(comments.length, 3) - i), submission);
+        setTimeout(function (el) {el.className = 'submission faded-in'},
+            100*(Math.min(comments.length - 1, 3) - i), submission);
     }
 
     var wrapper = document.getElementById('content');
     wrapper.insertBefore(parent, wrapper.firstChild);
+
+    document.getElementById('hide').textContent = 'Hide ' +
+                                          Math.min(wrapper.children.length, 25);
+
 }
 list.comments = [];
-
-function timestamp(el, created) { // sets live timestamp, then sleeps again
-    var age = Date.now() - created;
-
-    var value;
-    if (value = div(age, 86400000)) { // assignments intended
-        el.nodeValue = value + ' day' + (value === 1 ? '' : 's') + ' ago';
-        setTimeout(timestamp, (value+1)*86400000 - age, el, created);
-    } else if (value = div(age, 3600000)) {
-        el.nodeValue = value + ' hour' + (value === 1 ? '' : 's') + ' ago';
-        setTimeout(timestamp, (value+1)*360000 - age, el, created);
-    } else if (value = div(age, 60000)) {
-        el.nodeValue = value + ' minute' + (value === 1 ? '' : 's') + ' ago';
-        setTimeout(timestamp, (value+1)*60000 - age, el, created);
-    } else {
-        el.nodeValue = 'just now';
-        setTimeout(timestamp, 60000 - age, el, created);
-    }    
-}
-
-function add_loader(el) {
-    ['tl', 'tr', 'br', 'bl'].forEach(function(which) {
-        var segment = document.createElement('span');
-        segment.setAttribute('class', 'load-segment load-' + which);
-        el.appendChild(segment);
-    });
-}
 
 function fetch(el) {
     for (var i = 0; i < el.children.length; i++) {

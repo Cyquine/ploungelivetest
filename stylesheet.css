@@ -8,23 +8,50 @@ a {
     text-decoration: none;
 }
 
+blockquote {
+    margin: 10px;
+    padding-left: 4px;
+    border-left: 2px #369 solid;
+}
+
 p {
     margin: 0;
 }
 
-#more {
+button {
+    padding: 0;
+    border: 0;
+    background: none;
+}   
+
+#more, #footer {
     background-color: #FFF;
     border: none;
     padding: 5px;
     width: 100%;
+    box-sizing: border-box;
+    text-align: center;
 }
 
-.fadedout {
+#footer {
+    margin-top: 10px;
+}
+
+#show {
+    float: left;
+}
+
+#hide {
+    float: right;
+}
+
+.faded-out {
     opacity: 0;
     transition: opacity 0.25s;
+    pointer-events: none;
 }
 
-.fadedin {
+.faded-in {
     opacity: 1;
     transition: opacity 0.25s;
 }
@@ -39,9 +66,6 @@ p {
     height: 30px;
     width: 30px;
     margin-top: -5px;
-    padding: 0;
-    border: 0;
-    background: none;
     float: left;
     text-align: center;
 }

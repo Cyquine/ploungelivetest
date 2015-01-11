@@ -11,22 +11,30 @@ if (!queries['subreddit']) queries['subreddit'] = 'MLPLounge';
 
 function getReddit(url) {
     clearTimeout(NEXT_CALL_TIMEOUT);
-    var script = document.createElement('script');
-    script.setAttribute('src', url);
-    document.body.appendChild(script);
-    document.body.removeChild(script);
-    LAST_CALL = Date.now();
+
+    var request = new XMLHttpRequest();
+    request.onload = function() {
+        LAST_CALL = Date.now();
+        if (this.status >= 200 && this.status < 400) {
+            more(JSON.parse(this.response));
+        } else {
+            setTimeout(getReddit, 2000, url);
+        }
+    }
+    request.onerror = function() {setTimeout(getReddit, 2000, url)};
+    request.open('GET', url, true);
+    request.send();
 }
 
 function getComments() {
     getReddit('https://www.reddit.com/r/' + queries['subreddit'] +
-                      '/comments.json?jsonp=more&before=' + getComments.before);
+                                 '/comments.json?before=' + getComments.before);
 }
 getComments.before = '';
 getComments();
 
 function more(data) {
-    new_comments = Array.prototype.unshift.apply(list.comments,
+    var new_comments = Array.prototype.unshift.apply(list.comments,
                                                       data['data']['children']);
     if (getComments.before === '') {
         getComments.before = list.comments[0]['data']['name'];

@@ -41,6 +41,7 @@ function list() {
 
         var link_title = document.createElement('a');
         link_title.appendChild(document.createTextNode(c['link_title']));
+        bpm(link_title);
         link_title.setAttribute('target', '_blank');
         link_title.setAttribute('href', c['link_url']);
 
@@ -99,6 +100,7 @@ function list() {
         var comment = document.createElement('div');
         comment.innerHTML = c['body_html'];
         comment.innerHTML = comment.firstChild.nodeValue;
+        bpm(comment);
         comment.insertBefore(comment_header, comment.firstChild);
         comment.setAttribute('class', 'comment');
         

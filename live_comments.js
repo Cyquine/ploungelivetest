@@ -1,14 +1,26 @@
 var LAST_CALL = 0,
-    NEXT_CALL_TIMEOUT = setTimeout(undefined);
+    NEXT_CALL_TIMEOUT = setTimeout(null);
+
+var queries = {};
+for (var query_string = window.location.search.slice(1).split('&'), i = 0;
+        i < query_string.length; i++) {
+        var pair = query_string[i].split('=');
+        queries[pair[0]] = pair[1];
+}
+if (!queries['subreddit']) queries['subreddit'] = 'MLPLounge';
+
+function getReddit(url) {
+    clearTimeout(NEXT_CALL_TIMEOUT);
+    var script = document.createElement('script');
+    script.setAttribute('src', url);
+    document.body.appendChild(script);
+    document.body.removeChild(script);
+    LAST_CALL = Date.now();
+}
 
 function getComments() {
-    var script = document.createElement('script');
-    script.setAttribute('src',
-         'https://www.reddit.com/r/mlplounge/comments.json?jsonp=more&before=' +
-                                                            getComments.before);
-    document.body.appendChild(script);
-    LAST_CALL = Date.now();
-    document.body.removeChild(script);
+    getReddit('https://www.reddit.com/r/' + queries['subreddit'] +
+                      '/comments.json?jsonp=more&before=' + getComments.before);
 }
 getComments.before = '';
 getComments();
@@ -49,13 +61,19 @@ function list() {
         link_author.appendChild(document.createTextNode(c['link_author']));
         link_author.setAttribute('class', 'author');
         link_author.setAttribute('target', '_blank');
-        link_author.setAttribute('href', 'https://www.reddit.com/u/' +
-                                                              c['link_author']);
+        link_author.setAttribute('href', 'https://www.reddit.com/u/' + c['link_author']);
+
+        var subreddit = document.createElement('a');
+        subreddit.appendChild(document.createTextNode('/r/' + c['subreddit']));
+        subreddit.setAttribute('target', '_blank');
+        subreddit.setAttribute('href', 'https://www.reddit.com/r/' + c['subreddit']);
 
         var link = document.createElement('p');
         link.appendChild(link_title);
         link.appendChild(document.createTextNode(' by '));
         link.appendChild(link_author);
+        link.appendChild(document.createTextNode(' in '));
+        link.appendChild(subreddit);
         link.setAttribute('class', 'link');
 
         var author = document.createElement('a');
@@ -76,8 +94,12 @@ function list() {
 
         var load_submission = document.createElement('button');
         add_loader(load_submission);
-        load_submission.setAttribute('class', 'load');
         load_submission.setAttribute('onclick', 'fetch(this)');
+
+        //if (link_title) // TODO finish
+        // https://github.com/honestbleeps/Reddit-Enhancement-Suite/blob/master/lib/modules/showImages.js
+        load_submission.setAttribute('class', /*loadable(c) ?*/ 'load'/* : 'unloadable'*/);
+        
 
         var load_parent = document.createElement('button');
         add_loader(load_parent);
@@ -112,8 +134,8 @@ function list() {
 
         parent.appendChild(submission);
 
-        setTimeout(function (el) {el.className = 'submission faded-in'},
-            100*(Math.min(comments.length - 1, 3) - i), submission);
+        setTimeout(function (el){el.className = 'submission faded-in'},
+                        100*(Math.min(comments.length - 1, 3) - i), submission);
     }
 
     var wrapper = document.getElementById('content');
@@ -122,7 +144,6 @@ function list() {
     var hide_button = document.getElementById('hide');
     hide_button.textContent = 'Hide ' + Math.min(wrapper.children.length, 25);
     hide_button.setAttribute('class', 'faded-in');
-
 }
 list.comments = [];
 

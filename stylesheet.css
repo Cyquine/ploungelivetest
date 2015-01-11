@@ -28,30 +28,20 @@ button {
     border: 0;
     padding: 0;
     background: none;
-}
-
-/* Macro elements */ 
-
-#more, #footer {
-    border: none;
-    padding: 5px;
-    width: 100%;
-    box-sizing: border-box;
-    background-color: #fff;
+    font-family: inherit;
+    font-size: 1em;
     text-align: center;
 }
 
-#footer {
-    margin-top: 10px;
+button:focus {
+    outline: none;
 }
 
-#show {
-    float: left;
+button::-moz-focus-inner {
+    border: 0;
 }
 
-#hide {
-    float: right;
-}
+/* Statuses */
 
 .faded-out {
     opacity: 0;
@@ -62,6 +52,40 @@ button {
 .faded-in {
     opacity: 1;
     transition: opacity 0.25s;
+}
+
+/* Macro elements */ 
+
+#more, #footer {
+    width: 100%;
+    box-sizing: border-box;
+    background-color: #fff;
+}
+
+#more {
+    border: none;
+    padding: 5px;
+}
+
+#footer {
+    margin-top: 10px;
+}
+
+#hidden-comments {
+    padding: 5px;
+    text-align: center;
+}
+
+#show {
+    float: left;
+    padding: 5px 50px;
+    border-right: 1px solid #888;
+}
+
+#hide {
+    float: right;
+    padding: 5px 50px;
+    border-left: 1px solid #888;
 }
 
 /* Submission */
@@ -112,7 +136,7 @@ button {
 
 /* Loading icon */
 
-.load {
+.load, .unloadable {
     float: left;
     margin-top: -5px;
     height: 30px;
@@ -169,4 +193,21 @@ button {
 @keyframes load {
     0% {background-position: 0}
     100% {background-position: 64px}
+}
+
+.unloadable::after, .unloadable:after,
+    .unloadable::before, .unloadable:before {
+    content: "";
+    position: absolute;
+    margin: -2px -8px;
+    height: 4px;
+    width: 16px;    
+}
+
+.unloadable::after, .unloadable:after {
+    transform: rotate(45deg);
+}
+
+.unloadable::before, .unloadable:before {
+    transform: rotate(-45deg);
 }

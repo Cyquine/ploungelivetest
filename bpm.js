@@ -23,13 +23,9 @@ function bpm(node) { // borrows heavily from bpm's mechanism
                 }
             } else if (node.tagName === 'A') { // an anchor having no text is a
                                                // good sign of it being an emote
-                
                 var text = '[](' + node.getAttribute('href');  
-                if (node.hasAttribute('title')) {
-                    text += ' "' + node.getAttribute('title') + '")';
-                } else {
-                    text += ')';
-                }
+                text += node.hasAttribute('title') ?
+                        ' "' + node.getAttribute('title') + '")' : ')';
 
                 var replacement = document.createElement('span');
                 replacement.appendChild(document.createTextNode(text));
@@ -41,7 +37,7 @@ function bpm(node) { // borrows heavily from bpm's mechanism
             }
         }
 
-        while (!node.nextSibling) {
+        while (node.nextSibling === null) {
             node = node.parentNode;
             if (--depth === 0) return;
         }

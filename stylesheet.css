@@ -84,12 +84,22 @@ button::-moz-focus-inner {
     overflow: hidden;
 }
 
+.comments {
+    display: flex;
+}
+
 /* Comment */
 
 .comment {
     height: 100%;
     width: 100%;
     background-color: #fff;
+    overflow: hidden;
+    transition: margin-left 1s, height 0.5s 1s;
+}
+
+.comment-placeholder {
+    width: 100%;
     transition: margin-left 1s;
 }
 
@@ -214,16 +224,19 @@ button::-moz-focus-inner {
     transition: opacity 0.25s;
 }
 
-.shifted-left, .shifted-right{
+.shifted-left, .shifted-right {
     height: 0;
     overflow: hidden;
-    transition: margin-left 1s, height 0s 1s;
 }
 
 .shifted-left {
-    margin-left: calc(-100% - 20px);
+    margin-left: calc(-100% - 10px);
+    margin-right: 10px;
+    transition: margin-left 1s;
 }
 
 .shifted-right {
-    margin-left: calc(100% + 20px);
+    margin-left: 10px;
+    margin-right: calc(-100% - 10px);
+    transition: margin-right 1s;
 }

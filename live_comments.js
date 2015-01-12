@@ -18,6 +18,7 @@ document.addEventListener('DOMContentLoaded', function() {
     getComments();
 
     list.comments = [];
+    loaded_comments = {};
 });
 
 function getReddit(url, callback) {
@@ -55,8 +56,14 @@ function getComments() {
 
     getReddit('https://www.reddit.com/r/' + queries.subreddit +
                           '/comments.json?' + params.join('&'), function(data) {
-        var new_comments = Array.prototype.unshift.apply(list.comments,
-                                                            data.data.children);
+        for (var comments = data.data.children, i = comments.length - 1; i >= 0; i--) {
+            if (!loaded_comments[comments[i].data.name]) {
+                loaded_comments[comments[i].data.name] = true;
+                list.comments.unshift(comments[i]);
+            }
+        }
+
+        var new_comments = list.comments.length;
         if (getComments.params.before === '') {
             getComments.params.before = list.comments[0].data.name;
             list();
@@ -82,7 +89,7 @@ function list() {
 
     var parent = document.createDocumentFragment();
     for (var i = 0; i < comments.length; i++) {
-        var c = comments[i].data;            
+        var c = comments[i].data;
 
         var link_title = document.createElement('a');
         link_title.appendChild(document.createTextNode(c.link_title));
@@ -242,9 +249,8 @@ function fetch_parent(event) {
                 } else {
                     var last = root;
                 }
-
+                loaded_comments[comment_data.name] = true;
                 var comment = document.createElement('div');
-                
                 wrapper.insertBefore(comment, last);
                 createComment(comment_data, comment, submitter);
                 comment.classList.add('shifted-left');
@@ -270,7 +276,7 @@ function fetch_parent(event) {
         root.style.height = '100%';
         root.className = 'comment shifted-right';
         parent.addEventListener('transitionend', (function handler(inital_height) {
-            this.removeEventListener('transitionend', handler);
+            this.removeEventListener('transitionend', handler); // TODO: work out why this sometimes doesn't work
             var final_height = this.scrollHeight;
             if (final_height > this.offsetHeight) {
                 this.style.height = final_height +'px';

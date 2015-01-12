@@ -11,6 +11,7 @@ document.addEventListener('DOMContentLoaded', function() {
             queries[pair[0]] = pair[1];
     }
     if (!queries.subreddit) queries.subreddit = 'MLPLounge';
+    document.title = 'comments: ' + queries.subreddit;
 
     getComments.params = {'before': ''};
     if (queries.limit) getComments.params.limit = queries.limit;
@@ -43,7 +44,7 @@ function getReddit(url, callback) {
             setTimeout(getReddit, 2000, url);
         };
 
-        request.open('GET', url, true);
+        request.open('GET', url);
         request.send();
     }
 }
@@ -62,9 +63,12 @@ function getComments() {
         } else if (new_comments > 0) {
             getComments.params.before = list.comments[0].data.name;
             var more_button = document.getElementById('more');
-            more_button.textContent = new_comments + ' new comment' +
-                                                (new_comments === 1 ? '' : 's');
-            more_button.className = 'faded-in';       
+            more_button.className = 'faded-in';
+
+            var message = new_comments + ' new comment' + (new_comments === 1 ? '' : 's');
+            more_button.textContent = message;
+
+            document.title = message + ': ' + queries.subreddit;
         }
     });
 }
@@ -74,6 +78,7 @@ function list() {
     list.comments = [];
 
     document.getElementById('more').className = 'faded-out';
+    document.title = 'comments: ' + queries.subreddit;
 
     var parent = document.createDocumentFragment();
     for (var i = 0; i < comments.length; i++) {

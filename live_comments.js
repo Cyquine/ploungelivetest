@@ -264,16 +264,17 @@ function fetch_parent(event) {
 
         root.style.height = '100%';
         root.className = 'comment shifted-right';
-        window.setTimeout(function(parent, inital_height) {
-            var final_height = parent.scrollHeight;
-            if (final_height > parent.offsetHeight) {
-                parent.style.height = final_height +'px';
+        parent.addEventListener('transitionend', (function handler(inital_height) {
+            this.removeEventListener('transitionend', handler);
+            var final_height = this.scrollHeight;
+            if (final_height > this.offsetHeight) {
+                this.style.height = final_height +'px';
             } else {
-                parent.style.height = inital_height +'px';
+                this.style.height = inital_height +'px';
             }
 
-            parent.nextSibling.style.height = '';
-        }, 1000, parent, inital_height);
+            this.nextSibling.style.height = '';
+        }).bind(parent, inital_height));
         el.disabled = false;
     }
 }

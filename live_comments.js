@@ -242,13 +242,11 @@ function fetch_parent(event) {
             // TODO: process submission
             var submitter = data[0].data.children[0].data.author;
             var wrapper = root.parentNode;
-            (function processComment(comment_data) {
-                var not_root = comment_data.name !== parent;
-                if (not_root) {
-                    var last = processComment(comment_data.replies.data.children[0].data);
-                } else {
-                    var last = root;
-                }
+            (function processComment(c_data) {
+                var last = comment_data.name !== parent ?
+                    processComment(comment_data.replies.data.children[0].data) :
+                    root;
+
                 loaded_comments[comment_data.name] = true;
                 var comment = document.createElement('div');
                 wrapper.insertBefore(comment, last);
@@ -275,17 +273,12 @@ function fetch_parent(event) {
 
         root.style.height = '100%';
         root.className = 'comment shifted-right';
-        parent.addEventListener('transitionend', (function handler(inital_height) {
-            this.removeEventListener('transitionend', handler); // TODO: work out why this sometimes doesn't work
-            var final_height = this.scrollHeight;
-            if (final_height > this.offsetHeight) {
-                this.style.height = final_height +'px';
-            } else {
-                this.style.height = inital_height +'px';
-            }
-
-            this.nextSibling.style.height = '';
-        }).bind(parent, inital_height));
+        
+        setTimeout(function handler(parent, inital_height) {
+            parent.style.height = (parent.scrollHeight > parent.offsetHeight ?
+                                   parent.scrollHeight : inital_height) + 'px';
+            parent.nextSibling.style.height = '';
+        }, 1000, parent, inital_height);
         el.disabled = false;
     }
 }

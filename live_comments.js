@@ -242,7 +242,7 @@ function fetch_parent(event) {
             // TODO: process submission
             var submitter = data[0].data.children[0].data.author;
             var wrapper = root.parentNode;
-            (function processComment(c_data) {
+            (function processComment(comment_data) {
                 var last = comment_data.name !== parent ?
                     processComment(comment_data.replies.data.children[0].data) :
                     root;

@@ -41,19 +41,6 @@ button::-moz-focus-inner {
     border: 0;
 }
 
-/* Statuses */
-
-.faded-out {
-    opacity: 0;
-    pointer-events: none;
-    transition: opacity 0.25s;
-}
-
-.faded-in {
-    opacity: 1;
-    transition: opacity 0.25s;
-}
-
 /* Macro elements */ 
 
 #more, #footer {
@@ -94,12 +81,16 @@ button::-moz-focus-inner {
     margin: 10px 0;
     padding: 10px;
     background-color: #eee;
+    overflow: hidden;
 }
 
 /* Comment */
 
 .comment {
+    height: 100%;
+    width: 100%;
     background-color: #fff;
+    transition: margin-left 1s;
 }
 
 .comment-header {
@@ -208,4 +199,31 @@ button::-moz-focus-inner {
 
 .unloadable::before {
     transform: rotate(-45deg);
+}
+
+/* Statuses */
+
+.faded-out {
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.25s;
+}
+
+.faded-in {
+    opacity: 1;
+    transition: opacity 0.25s;
+}
+
+.shifted-left, .shifted-right{
+    height: 0;
+    overflow: hidden;
+    transition: margin-left 1s, height 0s 1s;
+}
+
+.shifted-left {
+    margin-left: calc(-100% - 20px);
+}
+
+.shifted-right {
+    margin-left: calc(100% + 20px);
 }

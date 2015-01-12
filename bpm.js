@@ -24,8 +24,7 @@ function bpm(node) { // borrows heavily from bpm's mechanism
             } else if (node.tagName === 'A') { // an anchor having no text is a
                                                // good sign of it being an emote
                 var text = '[](' + node.getAttribute('href');  
-                text += node.hasAttribute('title') ?
-                        ' "' + node.getAttribute('title') + '")' : ')';
+                text += node.hasAttribute('title') ? ' "' + node.title + '")' : ')';
 
                 var replacement = document.createElement('span');
                 replacement.appendChild(document.createTextNode(text));

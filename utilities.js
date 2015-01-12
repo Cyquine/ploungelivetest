@@ -22,7 +22,7 @@ function timestamp(el, created) { // sets live timestamp, then sleeps again
 function add_loader(el) {
     ['tl', 'tr', 'br', 'bl'].forEach(function(which) {
         var segment = document.createElement('span');
-        segment.setAttribute('class', 'load-segment load-' + which);
+        segment.className = 'load-segment load-' + which;
         el.appendChild(segment);
     });
 }
@@ -38,7 +38,7 @@ function show() {
         hidden = show.hidden.length;
 
     if (hidden === 0) {
-        show_button.setAttribute('class', 'faded-out');
+        show_button.className = 'faded-out';
         hidden_comments.textContent = 'No hidden comments';
     } else {
         show_button.textContent = 'Show ' + Math.min(hidden, 25);
@@ -46,7 +46,7 @@ function show() {
     }
 
     hide_button.textContent = 'Hide ' + Math.min(wrapper.children.length, 25);
-    hide_button.setAttribute('class', 'faded-in');
+    hide_button.className = 'faded-in';
     
 }
 show.hidden = [];
@@ -65,9 +65,9 @@ function hide() {
         hidden = show.hidden.length;
 
     show_button.textContent = 'Show ' + Math.min(hidden, 25);
-    show_button.setAttribute('class', 'faded-in');
+    show_button.className = 'faded-in';
 
-    if (wrapper.children.length === 0) hide_button.setAttribute('class', 'faded-out');
+    if (wrapper.children.length === 0) hide_button.className = 'faded-out';
     else hide_button.textContent = 'Hide ' + Math.min(wrapper.children.length, 25);
 
     document.getElementById('hidden-comments').textContent = hidden +

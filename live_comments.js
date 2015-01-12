@@ -1,15 +1,23 @@
-var LAST_CALL = 0,
+document.addEventListener('DOMContentLoaded', function() {
+    document.getElementById('more').textContent = 'Loading...';
+
+    LAST_CALL = 0,
     NEXT_CALL_TIMEOUT = setTimeout(null);
 
-document.getElementById('more').textContent = 'Loading...';
+    queries = {};
+    for (var query_string = window.location.search.slice(1).split('&'), i = 0;
+            i < query_string.length; i++) {
+            var pair = query_string[i].split('=');
+            queries[pair[0]] = pair[1];
+    }
+    if (!queries['subreddit']) queries['subreddit'] = 'MLPLounge';
 
-var queries = {};
-for (var query_string = window.location.search.slice(1).split('&'), i = 0;
-        i < query_string.length; i++) {
-        var pair = query_string[i].split('=');
-        queries[pair[0]] = pair[1];
-}
-if (!queries['subreddit']) queries['subreddit'] = 'MLPLounge';
+    getComments.params = {'before': ''};
+    if (queries['limit']) getComments.params['limit'] = queries['limit'];
+    getComments();
+
+    list.comments = [];
+});
 
 function getReddit(url, callback) {
     clearTimeout(NEXT_CALL_TIMEOUT);
@@ -55,9 +63,6 @@ function getComments() {
         }
     });
 }
-getComments.params = {'before': ''};
-if (queries['limit']) getComments.params['limit'] = queries['limit'];
-getComments();
 
 function list() {
     var comments = list.comments;
@@ -127,7 +132,6 @@ function list() {
     hide_button.textContent = 'Hide ' + Math.min(wrapper.children.length, 25);
     hide_button.className = 'faded-in';
 }
-list.comments = [];
 
 function createComment(data, el) {
     var author = document.createElement('a');
@@ -202,6 +206,7 @@ function fetch_parent(event) {
         getReddit(link.slice(0, link.lastIndexOf('/') + 1) + parent.slice(3) +
                                              '.json?context=8', function(data) {
             // process submission
+
 
 
 

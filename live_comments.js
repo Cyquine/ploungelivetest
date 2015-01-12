@@ -176,8 +176,8 @@ function createComment(data, el, submitter) {
     var permalink = document.createElement('a');
     permalink.className = 'permalink';
     permalink.target = '_blank';
-    permalink.href = 'https://www.reddit.com/r/MLPLounge/comments/' +
-                                        data.link_id.slice(3) + '/x/' + data.id;
+    permalink.href = 'https://www.reddit.com/r/' + data.subreddit +
+                         '/comments/' + data.link_id.slice(3) + '/x/' + data.id;
 
     var comment_header = document.createElement('div');
     comment_header.appendChild(load_parent);

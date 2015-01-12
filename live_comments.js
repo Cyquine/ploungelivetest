@@ -87,7 +87,7 @@ function list() {
         
         var link_author = document.createElement('a');
         link_author.appendChild(document.createTextNode(c.link_author));
-        link_author.className = 'author';
+        link_author.className = 'author submitter';
         link_author.href ='https://www.reddit.com/u/' + c.link_author;
         link_author.target = '_blank';
 
@@ -122,7 +122,7 @@ function list() {
             comment_wrapper = document.createElement('div');
         comment_wrapper.appendChild(comment);
         submission.appendChild(comment_wrapper);
-        createComment(c, comment);
+        createComment(c, comment, c.link_author);
         comment_wrapper.className = 'comments';
 
         parent.appendChild(submission);
@@ -139,18 +139,18 @@ function list() {
     hide_button.className = 'faded-in';
 }
 
-function createComment(data, el) {
+function createComment(data, el, submitter) {
     var author = document.createElement('a');
     author.appendChild(document.createTextNode(data.author));
-    author.className = 'author';
+    author.className = 'author' + (data.author === submitter ? ' submitter' : '');
     author.href = 'https://www.reddit.com/u/' + data.author;
     author.target = '_blank';
 
     var created_text = document.createTextNode('');
     timestamp(created_text, data.created_utc*1000);
 
-    var created = document.createElement('time'),
-        created_time = new Date(data.created_utc*1000);
+    var created = document.createElement('time');
+    var created_time = new Date(data.created_utc*1000);
     created.appendChild(created_text);
     created.className = 'created';
     created.datetime = created_time.toISOString();
@@ -228,7 +228,7 @@ function fetch_parent(event) {
         getReddit(link.slice(0, link.lastIndexOf('/') + 1) + parent.slice(3) +
                                              '.json?context=8', function(data) {
             // TODO: process submission
-
+            var submitter = data[0].data.children[0].data.author;
             var wrapper = root.parentNode;
             (function processComment(comment_data) {
                 var not_root = comment_data.name !== parent;
@@ -241,7 +241,7 @@ function fetch_parent(event) {
                 var comment = document.createElement('div');
                 
                 wrapper.insertBefore(comment, last);
-                createComment(comment_data, comment);
+                createComment(comment_data, comment, submitter);
                 comment.classList.add('shifted-left');
                 return comment;
             })(data[1].data.children[0].data);
@@ -257,15 +257,23 @@ function fetch_parent(event) {
         }
 
         var parent = root.previousSibling;
-        var real_height = parent.scrollHeight;
+        var inital_height = parent.scrollHeight;
         parent.style.height = root.offsetHeight + 'px';
         parent.offsetHeight; // force reflow
         parent.classList.remove('shifted-left');
-        parent.style.height = real_height +'px';
 
         root.style.height = '100%';
         root.className = 'comment shifted-right';
-        window.setTimeout(function(root) {root.style.height = ''}, 1000, root);
+        window.setTimeout(function(parent, inital_height) {
+            var final_height = parent.scrollHeight;
+            if (final_height > parent.offsetHeight) {
+                parent.style.height = final_height +'px';
+            } else {
+                parent.style.height = inital_height +'px';
+            }
+
+            parent.nextSibling.style.height = '';
+        }, 1000, parent, inital_height);
         el.disabled = false;
     }
 }

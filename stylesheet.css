@@ -88,6 +88,14 @@ button::-moz-focus-inner {
     display: flex;
 }
 
+.submitter {
+    border-radius: 3px;
+    padding: 0 3px;
+    background-color: #0055df;
+    color: #fff;
+    font-weight: bold;
+}
+
 /* Comment */
 
 .comment {
@@ -95,7 +103,7 @@ button::-moz-focus-inner {
     width: 100%;
     background-color: #fff;
     overflow: hidden;
-    transition: margin-left 1s, height 0.5s 1s;
+    transition: margin-left 1s, height 0.5s;
 }
 
 .comment-placeholder {

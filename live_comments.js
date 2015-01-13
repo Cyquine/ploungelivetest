@@ -171,7 +171,12 @@ function createComment(data, el, submitter) {
     var load_parent = document.createElement('button');
     add_loader(load_parent);
     load_parent.className = 'load parent';
-    load_parent.onclick = fetch_parent;
+    load_parent.onclick = fetchParent;
+
+    var load_child = document.createElement('button');
+    add_loader(load_child);
+    load_child.className = 'load child';
+    load_child.onclick = fetchChild;
 
     var permalink = document.createElement('a');
     permalink.className = 'permalink';
@@ -184,6 +189,7 @@ function createComment(data, el, submitter) {
     comment_header.appendChild(permalink);
     comment_header.appendChild(author);
     comment_header.appendChild(created);
+    comment_header.appendChild(load_child);
     comment_header.className = 'comment-header';
 
     el.innerHTML = data.body_html;
@@ -193,48 +199,45 @@ function createComment(data, el, submitter) {
     el.id = data.name;
     el.className = 'comment';
     el.dataset.parent = data.parent_id;
+
+    loaded_comments[data.name] = {'element': el};
 }
 
 function fetch(el) {
     if (el.target) el = el.target; // el could be event or element
-
-    for (var i = 0; i < el.children.length; i++) {
-        el.children[i].classList.add('loading');
-    }
+    load(el);
 }
 
-function fetch_parent(event) {
+function fetchParent(event) {
     var el = event.target;
     el.disabled = true;
-    for (var i = 0; i < el.children.length; i++) {
-        el.children[i].classList.add('loading');
-    }
+    load(el);
 
     var root = el.parentNode.parentNode,
-        parent = root.dataset.parent,
-        parent_on_page;
+        parent = root.dataset.parent;
     if (root.previousSibling) {
-        move_els();
+        moveEls();
     } else if (parent.slice(0, 3) === 't3_') {
         fetch(root.parentNode.parentNode.firstChild);
         var placeholder = document.createElement('div');
-        placeholder.className = 'comment-placeholder shifted-left';
+        placeholder.className = 'comment-fake shifted-left';
         root.parentNode.insertBefore(placeholder, root);
-        move_els();
-    } else if (parent_on_page = document.getElementById(parent)) {
+        moveEls();
+    } else if (loaded_comments[parent]) {
+        var parent_loaded = loaded_comments[parent].element;
         var wrapper = root.parentNode, // TODO: work out what to do here
             last = root;
         do {
-            var parent_parent = parent_on_page.previousSibling;
-            parent_on_page.classList.remove('shifted-right');
-            parent_on_page.classList.add('shifted-left'); 
-            wrapper.insertBefore(parent_on_page, last);
+            var parent_parent = parent_loaded.previousSibling;
+            parent_loaded.classList.remove('shifted-right');
+            parent_loaded.classList.add('shifted-left');
+            wrapper.insertBefore(parent_loaded, last);
 
-            last = parent_on_page;
-            parent_on_page = parent_parent;
-        } while (parent_on_page);
+            last = parent_loaded;
+            parent_loaded = parent_parent;
+        } while (parent_loaded);
 
-        move_els();
+        moveEls();
     } else {
         var link = root.firstChild.childNodes[1].href;
         getReddit(link.slice(0, link.lastIndexOf('/') + 1) + parent.slice(3) +
@@ -247,38 +250,94 @@ function fetch_parent(event) {
                     processComment(comment_data.replies.data.children[0].data) :
                     root;
 
-                loaded_comments[comment_data.name] = true;
                 var comment = document.createElement('div');
                 wrapper.insertBefore(comment, last);
                 createComment(comment_data, comment, submitter);
                 comment.classList.add('shifted-left');
+
                 return comment;
             })(data[1].data.children[0].data);
 
-            move_els();
+            moveEls();
         });
     }
 
-    function move_els() {
-        for (var i = 0; i < el.children.length; i++) {
-            var e = el.children[i];
-            e.classList.remove('loading');
-        }
+    function moveEls() {
+        unload(el);
 
         var parent = root.previousSibling;
-        var inital_height = parent.scrollHeight;
-        parent.style.height = root.offsetHeight + 'px';
+        var initial_height = parent.scrollHeight;
+        parent.style.height = root.scrollHeight + 'px';
         parent.offsetHeight; // force reflow
         parent.classList.remove('shifted-left');
+        adjustHeight(parent, initial_height);
 
-        root.style.height = '100%';
-        root.className = 'comment shifted-right';
-        
-        setTimeout(function handler(parent, inital_height) {
-            parent.style.height = (parent.scrollHeight > parent.offsetHeight ?
-                                   parent.scrollHeight : inital_height) + 'px';
-            parent.nextSibling.style.height = '';
-        }, 1000, parent, inital_height);
+        root.style.height = root.scrollHeight + 'px';
+        root.className = 'comment shifted-right';     
+
         el.disabled = false;
+    }
+}
+
+function fetchChild(event) {
+    var el = event.target;
+    el.disabled = true;
+    load(el);
+
+    var root = el.parentNode.parentNode,
+        child = root.dataset.parent,
+        child_loaded;
+    if (root.nextSibling) {
+        moveEls();
+    }
+
+    function moveEls() {
+        unload(el);
+
+        var child = root.nextSibling;
+        var initial_height = child.scrollHeight;
+        child.style.height = root.scrollHeight + 'px';
+        child.offsetHeight; // force reflow
+        child.classList.remove('shifted-right');
+        adjustHeight(child, initial_height);
+
+        root.style.height = root.scrollHeight + 'px';
+        root.className = 'comment shifted-left';
+
+        el.disabled = false;
+    }
+}
+
+function adjustHeight(element, initial_height) {
+    if (element.classList.contains('comment-fake')) {
+        element.addEventListener('transitionend', function f(event) {
+            var el = event.target;
+            el.removeEventListener('transitionend', f);
+            el.style.height = '0px';
+            if (el.previousSibling) el.previousSibling.style.height = '';
+            if (el.nextSibling) el.nextSibling.style.height = '';
+        });
+    } else {
+        var c = loaded_comments[element.id];
+
+        c.adjustHeightHandler = handler.bind(null, initial_height);
+
+        element.addEventListener('transitionend', c.adjustHeightHandler);
+    }
+
+    function handler(initial_height, event) {
+        var el = event.target;
+        var comment = loaded_comments[el.id];
+
+        if (event.propertyName !== 'height') {
+            el.style.height = (el.scrollHeight > el.offsetHeight ?
+                               el.scrollHeight : initial_height) + 'px';
+            if (el.previousSibling) el.previousSibling.style.height = '';
+            if (el.nextSibling) el.nextSibling.style.height = '';
+        } else {
+            el.removeEventListener('transitionend', comment.adjustHeightHandler);
+            delete comment.adjustHeightHandler;
+            el.style.height = '';
+        }
     }
 }

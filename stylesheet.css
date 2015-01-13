@@ -14,6 +14,12 @@ p {
     margin: 0;
 }
 
+@media all and (max-width: 550px) {
+    p {
+        font-size: small;
+    }
+}
+
 a {
     text-decoration: none;
 }
@@ -103,12 +109,12 @@ button::-moz-focus-inner {
     width: 100%;
     background-color: #fff;
     overflow: hidden;
-    transition: margin-left 1s, height 0.5s;
+    transition: margin-left 1s, margin-right 1s, height 0.5s;
 }
 
-.comment-placeholder {
+.comment-fake {
     width: 100%;
-    transition: margin-left 1s;
+    transition: margin-left 1s, height 0.5s;
 }
 
 .comment-header {
@@ -156,39 +162,48 @@ button::-moz-focus-inner {
     transform: rotate(90deg);
 }
 
-.load-segment {
+.load.child {
+    transform: rotate(-90deg);
+    float: right;
+}
+
+.load-segment::after, .load-segment::before, .load::after, .load::before {
+    content: "";
     position: absolute;
     transform-origin: 0 0;
     height: 4px;
     width: 16px;
 }
 
-.load-tl {
+.load-segment::after {
     margin-left: -14px;
     transform: rotate(-45deg);
 }
 
-.load-tr {
+.load-segment::before {
     margin-top: -14px;
     transform: rotate(45deg);
     animation-delay: 0.25s;
+    -webkit-animation-delay: 0.25s;
 }
 
-.load-br {
+.load::after {
     margin-left: 14px;
     transform: rotate(135deg);
     background-image: linear-gradient(to right, transparent 25%, #888 25%);
     animation-delay: -0.5s;
+    -webkit-animation-delay: -0.5s;
 }
 
-.load-bl {
+.load::before {
     margin-top: 14px;
     transform: rotate(225deg);
     background-color: #888;
     animation-delay: -0.25s;
+    -webkit-animation-delay: -0.25s;
 }
 
-.loading {
+.loading::after, .loading::before {
     background-color: transparent;
     background-image: linear-gradient(to right, transparent 25%, #888 50%); 
     background-size: 400%;
@@ -196,11 +211,17 @@ button::-moz-focus-inner {
     animation-duration: 1s;
     animation-timing-function: linear;
     animation-iteration-count: infinite;
+    -webkit-animation-name: load;
+    -webkit-animation-duration: 1s;
+    -webkit-animation-timing-function: linear;
+    -webkit-animation-iteration-count: infinite;
 }
 
 @keyframes load {
-    0% {background-position: 0}
-    100% {background-position: 64px}
+    from {background-position: 0} to {background-position: 64px}
+}
+@-webkit-keyframes load {
+    from {background-position: 0} to {background-position: 64px}
 }
 
 .unloadable::after, .unloadable::before {

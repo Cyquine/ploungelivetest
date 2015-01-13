@@ -43,7 +43,13 @@ function bpm(node) { // borrows heavily from bpm's mechanism
 
         node = node.nextSibling;
     }
-} // Edited from bpm:     <   emote     >   <      alt-text   >
+}
+bpm.enabled = false;
+bpm.toggle = function() {
+    bpm.enabled = !bpm.enabled;
+}
+
+// Edited from bpm:     <   emote     >   <      alt-text   >
 bpm.emote_regexp = /(\[\]\(\/[\w:!#\/\-]+\s*(?:["'][^"]*["'])?)\)/g;
 // Copied from bpm:
 bpm.tag_blacklist = {

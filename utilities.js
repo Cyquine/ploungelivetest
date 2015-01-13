@@ -20,11 +20,19 @@ function timestamp(el, created) { // sets live timestamp, then sleeps again
 }
 
 function add_loader(el) {
-    ['tl', 'tr', 'br', 'bl'].forEach(function(which) {
-        var segment = document.createElement('span');
-        segment.className = 'load-segment load-' + which;
-        el.appendChild(segment);
-    });
+    var segment = document.createElement('span');
+    segment.className = 'load-segment';
+    el.appendChild(segment);
+}
+
+function load(el) {
+    el.classList.add('loading');
+    el.firstChild.classList.add('loading');
+}
+
+function unload(el) {
+    el.classList.remove('loading');
+    el.firstChild.classList.remove('loading');
 }
 
 function show() {

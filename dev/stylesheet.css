@@ -1,0 +1,276 @@
+/* As a reminder for style:
+ * https://github.com/necolas/idiomatic-css
+ */
+
+/* General selectors */
+
+body {
+    padding: 10px;
+    min-width: 450px;
+    background-color: #ddf;
+    font-family: verdana, arial;
+}
+
+p {
+    margin: 0;
+}
+
+a {
+    text-decoration: none;
+}
+
+blockquote {
+    margin: 10px;
+    border-left: 2px #369 solid;
+    padding-left: 4px;
+}
+
+button {
+    border: 0;
+    padding: 0;
+    background: none;
+    font-family: inherit;
+    font-size: 1em;
+    text-align: center;
+}
+
+button:focus {
+    outline: none;
+}
+
+button::-moz-focus-inner {
+    border: 0;
+}
+
+@media all and (max-width: 550px) {
+    p, a, time {
+        font-size: small;
+    }
+}
+
+/* Macro elements */ 
+
+#more, #footer {
+    width: 100%;
+    background-color: #fff;
+}
+
+#more {
+    border: none;
+    padding: 5px;
+    box-sizing: border-box;
+}
+
+#footer {
+    margin-top: 10px;
+}
+
+#hidden-comments {
+    padding: 5px;
+    text-align: center;
+}
+
+#show {
+    float: left;
+    padding: 5px 50px;
+    border-right: 1px solid #888;
+}
+
+#hide {
+    float: right;
+    padding: 5px 50px;
+    border-left: 1px solid #888;
+}
+
+/* Submission */
+
+.submission {
+    margin: 10px 0;
+    background-color: #eee;
+    overflow: hidden;
+}
+
+.sub-header {
+    padding: 10px;
+}
+
+.comments {
+    margin: 0 10px 10px 10px;
+    display: flex;
+}
+
+.submitter {
+    border-radius: 3px;
+    padding: 0 3px;
+    background-color: #0055df;
+    color: #fff;
+    font-weight: bold;
+}
+
+/* Comment */
+
+.comment {
+    height: 100%;
+    width: 100%;
+    background-color: #fff;
+    overflow: hidden;
+    transition: margin-left 1s, margin-right 1s, height 0.5s;
+}
+
+.comment-fake {
+    width: 100%;
+    transition: margin-left 1s, height 0.5s;
+}
+
+.comment-header {
+    padding: 10px;
+    width: calc(100% - 20px);
+    background-color: #ddd;
+}
+
+.link {
+    margin: 0 0 5px;
+}
+
+.permalink {
+    float: left;
+    margin: -5px 5px 0 5px;
+    display: inline-block;
+    height: 30px;
+    width: 30px;
+    background-image: url(https://www.redditstatic.com/about/assets/reddit-alien-small.png);
+    background-repeat: no-repeat;
+    background-size: cover;
+    opacity: 0.5;
+}
+
+.created {
+    padding-left: 10px;
+}
+
+.md {
+    margin: 10px 10px 0;
+    padding-bottom: 10px;
+}
+
+/* Loading icon */
+
+.load, .unloadable {
+    float: left;
+    margin-top: -5px;
+    height: 30px;
+    width: 30px;
+    text-align: center;
+}
+
+.load.parent {
+    transform: rotate(90deg);
+}
+
+.load.child {
+    transform: rotate(-90deg);
+    float: right;
+}
+
+.load-segment::after, .load-segment::before, .load::after, .load::before {
+    content: "";
+    position: absolute;
+    transform-origin: 0 0;
+    height: 4px;
+    width: 16px;
+}
+
+.load-segment::after {
+    margin-left: -14px;
+    transform: rotate(-45deg);
+}
+
+.load-segment::before {
+    margin-top: -14px;
+    transform: rotate(45deg);
+    animation-delay: 0.25s;
+    -webkit-animation-delay: 0.25s;
+}
+
+.load::after {
+    margin-left: 14px;
+    transform: rotate(135deg);
+    background-image: linear-gradient(to right, transparent 25%, #888 25%);
+    animation-delay: -0.5s;
+    -webkit-animation-delay: -0.5s;
+}
+
+.load::before {
+    margin-top: 14px;
+    transform: rotate(225deg);
+    background-color: #888;
+    animation-delay: -0.25s;
+    -webkit-animation-delay: -0.25s;
+}
+
+.loading::after, .loading::before {
+    background-color: transparent;
+    background-image: linear-gradient(to right, transparent 25%, #888 50%); 
+    background-size: 400%;
+    animation-name: load;
+    animation-duration: 1s;
+    animation-timing-function: linear;
+    animation-iteration-count: infinite;
+    -webkit-animation-name: load;
+    -webkit-animation-duration: 1s;
+    -webkit-animation-timing-function: linear;
+    -webkit-animation-iteration-count: infinite;
+}
+
+@keyframes load {
+    from {background-position: 0} to {background-position: 64px}
+}
+@-webkit-keyframes load {
+    from {background-position: 0} to {background-position: 64px}
+}
+
+.unloadable::after, .unloadable::before {
+    content: "";
+    position: absolute;
+    margin: -2px -8px;
+    height: 4px;
+    width: 16px;    
+}
+
+.unloadable::after {
+    transform: rotate(45deg);
+}
+
+.unloadable::before {
+    transform: rotate(-45deg);
+}
+
+/* Statuses */
+
+.faded-out {
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.25s;
+}
+
+.faded-in {
+    opacity: 1;
+    transition: opacity 0.25s;
+}
+
+.shifted-left, .shifted-right {
+    height: 0;
+    overflow: hidden;
+}
+
+.shifted-left {
+    margin-left: calc(-100% - 10px);
+    margin-right: 10px;
+    transition: margin-left 1s;
+}
+
+.shifted-right {
+    margin-left: 10px;
+    margin-right: calc(-100% - 10px);
+    transition: margin-right 1s;
+}

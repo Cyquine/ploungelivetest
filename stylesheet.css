@@ -6,18 +6,13 @@
 
 body {
     padding: 10px;
+    min-width: 450px;
     background-color: #ddf;
     font-family: verdana, arial;
 }
 
 p {
     margin: 0;
-}
-
-@media all and (max-width: 550px) {
-    p {
-        font-size: small;
-    }
 }
 
 a {
@@ -45,6 +40,12 @@ button:focus {
 
 button::-moz-focus-inner {
     border: 0;
+}
+
+@media all and (max-width: 550px) {
+    p, a, time {
+        font-size: small;
+    }
 }
 
 /* Macro elements */ 
@@ -85,12 +86,16 @@ button::-moz-focus-inner {
 
 .submission {
     margin: 10px 0;
-    padding: 10px;
     background-color: #eee;
     overflow: hidden;
 }
 
+.sub-header {
+    padding: 10px;
+}
+
 .comments {
+    margin: 0 10px 10px 10px;
     display: flex;
 }
 

@@ -9,7 +9,7 @@ function bpm(node) { // borrows heavily from bpm's mechanism
                 continue;
             }
 
-            if (node.nodeType === Node.TEXT_NODE) {
+            if (node.nodeType === 3) { // Node.TEXT_NODE == 3
                 var matches = node.data.split(bpm.emote_regexp);
                 if (matches.length > 1) { // splits emote over 2 text nodes
                     node.data = ')' + matches.pop();

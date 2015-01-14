@@ -124,9 +124,13 @@ function list() {
         // https://github.com/honestbleeps/Reddit-Enhancement-Suite/blob/master/lib/modules/showImages.js
         load_submission.className = /*loadable(c) ?*/ 'load'/* : 'unloadable'*/;
         
+        var sub_header = document.createElement('div');
+        sub_header.appendChild(load_submission);
+        sub_header.appendChild(link);
+        sub_header.className = 'sub-header';
+
         var submission = document.createElement('div');
-        submission.appendChild(load_submission);
-        submission.appendChild(link);
+        submission.appendChild(sub_header);
         submission.id = c.link_id.slice(3);
         submission.className = 'submission faded-out';
 
@@ -218,7 +222,7 @@ function fetchParent(event) {
     if (root.previousSibling) {
         moveEls();
     } else if (parent.slice(0, 3) === 't3_') {
-        fetch(root.parentNode.parentNode.firstChild);
+        fetch(root.parentNode.parentNode.firstChild.firstChild);
         var placeholder = document.createElement('div');
         placeholder.className = 'comment-fake shifted-left';
         root.parentNode.insertBefore(placeholder, root);
@@ -330,14 +334,19 @@ function adjustHeight(element, initial_height) {
         var comment = loaded_comments[el.id];
 
         if (event.propertyName !== 'height') {
-            el.style.height = (el.scrollHeight > el.offsetHeight ?
-                               el.scrollHeight : initial_height) + 'px';
             if (el.previousSibling) el.previousSibling.style.height = '';
             if (el.nextSibling) el.nextSibling.style.height = '';
-        } else {
-            el.removeEventListener('transitionend', comment.adjustHeightHandler);
-            delete comment.adjustHeightHandler;
-            el.style.height = '';
+
+            if (el.scrollHeight > el.offsetHeight) {
+                el.style.height = el.scrollHeight + 'px';
+                return;
+            } else if (initial_height !== el.offsetHeight) {
+                el.style.height = initial_height + 'px';
+                return;
+            }
         }
+        el.removeEventListener('transitionend', comment.adjustHeightHandler);
+        delete comment.adjustHeightHandler;
+        el.style.height = '';
     }
 }

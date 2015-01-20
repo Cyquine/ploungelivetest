@@ -1,0 +1,91 @@
+'use strict';
+liveComments.Submission = function(data) {
+    this.copies = [(function() {
+        // data from comment has link attributes prefixed with 'link_'
+        var prefix = data.name[1] === '1' ? 'link_' : '';
+
+        var loader = document.createElement('button');
+        loader.className = 'loader';
+        loader.onclick = this.fetch;
+
+        var title = document.createElement('a');
+        title.innerHTML = data[prefix + 'title'];
+        liveComments.bpm(title);
+        title.href = data[prefix + 'url'];
+        title.target = '_blank';
+
+        var author;
+        if (data[prefix + 'author'] === '[deleted]') {
+            author = document.createElement('p');
+            author.className = 'author';
+        } else {
+            author = document.createElement('a');
+            author.className = 'author submitter';
+            author.href ='//www.reddit.com/u/' + data[prefix + 'author'];
+            author.target = '_blank';
+        }
+        author.appendChild(document.createTextNode(data[prefix + 'author']));
+        
+        var subreddit = document.createElement('a');
+        subreddit.appendChild(document.createTextNode('/r/' + data.subreddit));
+        subreddit.href = '//www.reddit.com/r/' + data.subreddit;
+        subreddit.target = '_blank';
+
+        var link = document.createElement('p');
+        link.appendChild(title);
+        link.appendChild(document.createTextNode(' by '));
+        link.appendChild(author);
+        link.appendChild(document.createTextNode(' in '));
+        link.appendChild(subreddit);
+        link.className = 'link';
+
+        var header = document.createElement('div');
+        header.appendChild(loader);
+
+        var id = prefix ? data.link_id.slice(3) : data.id;
+        if (data.is_self === false || title.pathname.lastIndexOf('/r/' +
+                data.subreddit + '/comments/' + id) !== 0) {
+            var permalink = document.createElement('a');            
+            permalink.className = 'permalink';
+            permalink.href = '//redd.it/' + id;
+            permalink.target = '_blank';
+            header.appendChild(permalink);
+        }
+
+        header.appendChild(link);
+        header.className = 'submission-header';
+
+        var comments = document.createElement('div');
+        comments.className = 'comments';
+
+        var submission = document.createElement('div');
+        submission.appendChild(header);
+        submission.appendChild(comments);
+        submission.className = 'submission';
+
+        return submission;
+    }).apply(this)];
+}
+
+liveComments.Submission.prototype.getCopy = function(comment_id) {
+        // copies reference element with event listeners
+    var el = this.copies[0];
+    if (el.id) {
+        el = el.cloneNode(true);
+        el.firstChild.firstChild.onclick = this.fetch;
+
+        var comments = el.lastChild;
+        while (comments.hasChildNodes()) comments.removeChild(comments.firstChild);
+
+        this.copies.push(el);
+    }
+
+    el.id = comment_id + '-s';
+    return el;
+}
+
+liveComments.Submission.prototype.makeDeleted = function() {
+    for (var i = 0; i < this.copies.length; i++) {
+        this.copies[i].firstChild.lastChild.childNodes[2].classList.add('deleted');
+    }
+}

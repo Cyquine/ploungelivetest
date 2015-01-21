@@ -120,7 +120,7 @@ liveComments.Comment.prototype.fetchParent = function(event) {
                     parents.push(comment.id);
                     comment = comment.replies.data.children[0].data;
                 } while (comment.id !== parentId);
-                pc.push.apply();
+                pc.push.apply(parents);
             });
             parent = liveComments.loadedComments[parentId];
         }

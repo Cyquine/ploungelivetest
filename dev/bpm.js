@@ -19,13 +19,13 @@ liveComments.bpm = function(node) { // borrows heavily from bpm's mechanism
                     parent.insertBefore(document.createTextNode(
                                       matches.shift() + matches.shift()), node);
                     while (matches.length > 0) {
-                        parent.insertBefore(document.createTextNode(')' + 
+                        parent.insertBefore(document.createTextNode(')' +
                                       matches.shift() + matches.shift()), node);
                     }
                 }
             } else if (node.tagName === 'A') { // an anchor having no text is a
                                                // good sign of it being an emote
-                var text = '[](' + node.getAttribute('href');  
+                var text = '[](' + node.getAttribute('href');
                 text += node.hasAttribute('title') ? ' "' + node.title + '")' : ')';
 
                 var replacement = document.createElement('span');

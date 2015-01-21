@@ -2,7 +2,7 @@
  * https://github.com/necolas/idiomatic-css
  */
 
-/* General selectors */
+/* General */
 
 body {
     padding: 10px;
@@ -60,13 +60,21 @@ time {
 }
 
 #more {
+    position: sticky;
+    top: 0;
+    z-index: 1;
     border: none;
     padding: 5px;
     box-sizing: border-box;
+    box-shadow: 0 0 2px #888;
 }
 
 #footer {
+    position: sticky;
+    bottom: 0;
+    z-index: 1;
     margin-top: 10px;
+    box-shadow: 0 0 2px #888;
 }
 
 #hidden-comments {
@@ -124,11 +132,12 @@ time {
 /* Comment */
 
 .comment {
+    position: relative;
     height: 100%;
     width: 100%;
     background-color: #fff;
     overflow: hidden;
-    transition: margin-left 1s, margin-right 1s, height 0.5s;
+    transition: left 1s, height 0.5s;
 }
 
 .comment-fake {
@@ -166,7 +175,6 @@ time {
 
 .md {
     padding: 10px;
-    
 }
 
 .md-wrapper {
@@ -283,17 +291,12 @@ time {
     transition: opacity 0.25s;
 }
 
-.shifted-left, .shifted-right {
-    position: relative;
-}
-
 .shifted-left {
-    margin-left: calc(-100% - 10px);
-    transition: margin-left 1s;
+    left: calc(-100% - 10px);
+    transition: left 1s;
 }
 
 .shifted-right {
-    margin-left: calc(100% + 10px);
-    transition: margin-left 1s;
+    left: calc(100% + 10px);
+    transition: left 1s;
 }
-

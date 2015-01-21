@@ -17,7 +17,8 @@ window.liveComments = {
             request.onload = function() {
                 liveComments.lastCall = Date.now();
                 if (request.status >= 200 && request.status < 400) {
-                    liveComments.nextCallTimeout = setTimeout(liveComments.getComments, 2000);
+                    liveComments.nextCallTimeout =
+                                     setTimeout(liveComments.getComments, 2000);
                     callback(JSON.parse(request.response));
                     return 0;
                 } else {
@@ -28,7 +29,8 @@ window.liveComments = {
             }
 
             request.onerror = function() {
-                liveComments.nextCallTimeout = setTimeout(liveComments.getReddit, 2000, url);
+                liveComments.nextCallTimeout =
+                       setTimeout(liveComments.getReddit.bind(null, url), 2000);
                 return 2;
             };
 
@@ -188,6 +190,8 @@ window.liveComments = {
                            hidden + ' hidden comment' + (hidden > 1 ? 's' : '');
     }
 };
+liveComments.listComments.comments = [];
+liveComments.showComments.comments = [];
 document.addEventListener('DOMContentLoaded', function() {
     var moreButton = document.getElementById('more');
     moreButton.firstChild.nodeValue = 'Loading...';
@@ -196,19 +200,16 @@ document.addEventListener('DOMContentLoaded', function() {
     document.getElementById('show').onclick = liveComments.showComments;
     document.getElementById('hide').onclick = liveComments.hideComments;
 
-    var q = liveComments.queries;
+    var queries = liveComments.queries;
     for (var queryString = location.search.slice(1).split('&'), i = 0;
             i < queryString.length; i++) {
         var pair = queryString[i].split('=');
-        q[pair[0]] = pair[1];
-    }
-    q.subreddit = q.subreddit || 'MLPLounge';
-    document.title = 'comments: ' + q.subreddit;
-
-    liveComments.listComments.comments = [];
-    liveComments.showComments.comments = [];
+        queries[pair[0]] = pair[1]
+;    }
+    queries.subreddit = queries.subreddit || 'MLPLounge';
+    document.title = 'comments: ' + queries.subreddit;
 
     liveComments.getComments.params = {'before': ''};
-    if (q.limit) liveComments.getComments.params.limit = q.limit;
+    if (queries.limit) liveComments.getComments.params.limit = queries.limit;
     liveComments.getComments();
 });

@@ -6,7 +6,7 @@ liveComments.Comment = function(data, opt_submitter) {
     this.timestampTimeouts = {};
     if (!opt_submitter) {
         this.parentChain = data.parent_id[1] === '1' ?
-                           [data.id, data.parent_id] : [data.id];
+                           [data.id, data.parent_id.slice(3)] : [data.id, ''];
     }
 
     this.element = (function() {
@@ -20,7 +20,7 @@ liveComments.Comment = function(data, opt_submitter) {
 
         var loadChild = document.createElement('button');
         loadChild.className = 'child loader';
-        loadParent.onclick = this.fetchChild;
+        loadChild.onclick = this.fetchChild;
 
         var permalink = document.createElement('a');
         permalink.className = 'permalink';
@@ -92,19 +92,35 @@ liveComments.Comment.prototype.getCopy = function() {
 }
 
 liveComments.Comment.prototype.fetchParent = function(event) {
-    var that = liveComments.loadedComments[this.parentNode.parentNode.id];
-    liveComments.load(event, function() {
-        console.log(that);
-    // var root = el.parentNode.parentNode;
+    var el = this.parentNode.parentNode; // this === event.target
+    liveComments.load(event, (function(el) {
+        var pc = this.parentChain,
+            parentId = pc[pc.indexOf(el.id.split('-', 1)[0]) + 1],
+            parentEl = liveComments.loadedComments[parentId];
+        if (parentId && parentEl) {
+            var link = el.firstChild.childNodes[3].href;
+            liveComments.getReddit(link.slice(0, link.lastIndexOf('/') + 1) +
+                                  parentId + '.json?context=8', function(data) {
+                var submitter = data[0].data.children[0].data.author;
+                if (submitter === '[deleted]') {
+                    liveComments.loadedSubmissions[data[0].data.id].makeDeleted();
+                }
 
-    // if (!this.parent) {
-    //     this.element.className = 'comment shifted-right';
-    // } else if (liveComments.loadedComments[this.parent]) {
-    //     moveEls();
-    // } else {
+                var lc = liveComments.loadedComments;
+                (function f(data) {
+                    var child = data.replies[0].data;
+                    if (child.id !== parentId) f(child);
 
-    // }
-    });
+                    lc[comment.id] = new Comment(comment, submitter);
+                    pc.push(comment.id);
+                })(data[1].data.children[0].data);
+            });
+            parentEl = liveComments.loadedComments[parentId];
+        }
+
+        
+
+    }).bind(liveComments.loadedComments[el.parentNode.parentNode.id.split('-', 1)[0]], el));
 }
 
 liveComments.Comment.prototype.createSubmission = function() {

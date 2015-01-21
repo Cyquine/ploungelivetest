@@ -119,7 +119,7 @@ liveComments.Comment.prototype.fetchParent = function(event) {
                     lc[comment.id] = new Comment(comment, submitter);
                     parents.push(comment.id);
                     comment = comment.replies.data.children[0].data;
-                } while (child.id !== parentId);
+                } while (comment.id !== parentId);
                 pc.push.apply();
             });
             parent = liveComments.loadedComments[parentId];

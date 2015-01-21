@@ -139,9 +139,11 @@ window.liveComments = {
             var submission = comments.shift();
             wrapper.appendChild(submission);
 
-            var comment = submission.lastChild.lastChild,
-                id = comment.id.split('-', 1)[0];
-            lc[id].show(comment);
+            var comment = submission.lastChild.lastChild;
+            if (comment) {
+                var id = comment.id.split('-', 1)[0];
+                lc[id].show(comment);
+            }
         }
 
         var showButton = document.getElementById('show'),
@@ -170,9 +172,11 @@ window.liveComments = {
             wrapper.removeChild(submission);
             comments.unshift(submission);
 
-            var comment = submission.lastChild.lastChild,
-                id = comment.id.split('-', 1)[0];
-            lc[id].hide(comment);
+            var comment = submission.lastChild.lastChild;
+            if (comment) {
+                var id = comment.id.split('-', 1)[0];
+                lc[id].hide(comment);
+            }
         }
 
         var showButton = document.getElementById('show'),
@@ -199,13 +203,15 @@ document.addEventListener('DOMContentLoaded', function() {
 
     document.getElementById('show').onclick = liveComments.showComments;
     document.getElementById('hide').onclick = liveComments.hideComments;
+    document.getElementById('content').style.paddingBottom = 
+                 document.getElementById('hidden-comments').offsetHeight + 'px';
 
     var queries = liveComments.queries;
     for (var queryString = location.search.slice(1).split('&'), i = 0;
             i < queryString.length; i++) {
         var pair = queryString[i].split('=');
-        queries[pair[0]] = pair[1]
-;    }
+        queries[pair[0]] = pair[1];
+    }
     queries.subreddit = queries.subreddit || 'MLPLounge';
     document.title = 'comments: ' + queries.subreddit;
 

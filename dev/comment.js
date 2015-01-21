@@ -95,9 +95,14 @@ liveComments.Comment.prototype.fetchParent = function(event) {
     var el = this.parentNode.parentNode; // this === event.target
     liveComments.load(event, (function(el) {
         var pc = this.parentChain,
-            parentId = pc[pc.indexOf(el.id.split('-', 1)[0]) + 1],
-            parentEl = liveComments.loadedComments[parentId];
-        if (parentId && parentEl) {
+            parentId = el.id.split('-', 1)[0];
+
+        while (pc[pc.length - 1] >= parentId) {
+            pc = liveComments.loadedComments[pc[pc.length - 1]].parentChain;
+        }
+        parentId = pc[pc.indexOf(parentId) + 1] ;
+        var parent = liveComments.loadedComments[parentId];
+        if (parentId && !parent) {
             var link = el.firstChild.childNodes[3].href;
             liveComments.getReddit(link.slice(0, link.lastIndexOf('/') + 1) +
                                   parentId + '.json?context=8', function(data) {
@@ -106,19 +111,48 @@ liveComments.Comment.prototype.fetchParent = function(event) {
                     liveComments.loadedSubmissions[data[0].data.id].makeDeleted();
                 }
 
-                var lc = liveComments.loadedComments;
-                (function f(data) {
-                    var child = data.replies[0].data;
-                    if (child.id !== parentId) f(child);
-
+                var lc = liveComments.loadedComments,
+                    comment = data[1].data.children[0].data,
+                    parents = [comment.parent_id[1] === '1' ?
+                               comment.parent_id.slice(3) : ''];
+                do {
                     lc[comment.id] = new Comment(comment, submitter);
-                    pc.push(comment.id);
-                })(data[1].data.children[0].data);
+                    parents.push(comment.id);
+                    comment = comment.replies[0].data.children[0].data;
+                } while (child.id !== parentId);
+                pc.push.apply();
             });
-            parentEl = liveComments.loadedComments[parentId];
+            parent = liveComments.loadedComments[parentId];
         }
 
-        
+        var wrapper = el.parentNode;
+        if (parent) {
+            var parentEl = parent.getCopy();
+            parent.setTimestamp(parentEl);
+
+            parentEl.classList.add('shifted-left');
+            wrapper.appendChild(parentEl);
+
+            var initialHeight = parentEl.offsetHeight;
+            parentEl.style.height = el.offsetHeight + 'px';
+            parentEl.offsetHeight; // force reflow
+
+            if (parentEl.scrollHeight < parentEl.offsetHeight) {
+                parentEl.style.height = parentEl.scrollHeight + 'px';
+            } else {
+                parentEl.style.height = initialHeight + 'px';
+            }
+            
+            parentEl.classList.remove('shifted-left');
+            el.style.position = 'absolute';
+        }
+        el.style.height = el.offsetHeight + 'px';
+        el.offsetHeight; // force reflow
+        el.classList.add('shifted-right'); 
+        el.style.height = '0';
+        setTimeout((function(el) {
+            this.removeCopy(el);
+        }).bind(this, el), 1500);
 
     }).bind(liveComments.loadedComments[el.parentNode.parentNode.id.split('-', 1)[0]], el));
 }

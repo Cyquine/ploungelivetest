@@ -5,7 +5,8 @@
 /* General */
 
 body {
-    padding: 10px;
+    margin: 0;
+    padding: 0;
     min-width: 450px;
     background-color: #ddf;
     font-family: verdana, arial;
@@ -52,7 +53,11 @@ time {
     }
 }
 
-/* Macro elements */ 
+/* Macro elements */
+
+#content {
+    padding: 10px;
+}
 
 #more, #footer {
     width: 100%;
@@ -70,10 +75,9 @@ time {
 }
 
 #footer {
-    position: sticky;
+    position: fixed;
     bottom: 0;
     z-index: 1;
-    margin-top: 10px;
     box-shadow: 0 0 2px #888;
 }
 
@@ -97,7 +101,7 @@ time {
 /* Submission */
 
 .submission {
-    margin: 10px 0;
+    margin-bottom: 10px;
     background-color: #eee;
     overflow: hidden;
 }
@@ -110,7 +114,9 @@ time {
 }
 
 .comments {
+    position: relative;
     margin: 10px;
+    min-height: 1px;
 }
 
 .author {
@@ -133,17 +139,21 @@ time {
 
 .comment {
     position: relative;
-    height: 100%;
+    left: 0;
+    top: 0;
     width: 100%;
     background-color: #fff;
     overflow: hidden;
-    transition: left 1s, height 0.5s;
+    transition: left 1s, height 0.5s 1s;
 }
 
-.comment-fake {
-    width: 100%;
-    transition: margin-left 1s, height 0.5s;
+.shifted-left {
+    left: calc(-100% - 10px);
 }
+
+.shifted-right {
+    left: calc(100% + 10px);
+} 
 
 .comment-header {
     padding: 5px;
@@ -289,14 +299,4 @@ time {
 .faded-in {
     opacity: 1;
     transition: opacity 0.25s;
-}
-
-.shifted-left {
-    left: calc(-100% - 10px);
-    transition: left 1s;
-}
-
-.shifted-right {
-    left: calc(100% + 10px);
-    transition: left 1s;
 }

@@ -118,7 +118,7 @@ liveComments.Comment.prototype.fetchParent = function(event) {
                 do {
                     lc[comment.id] = new Comment(comment, submitter);
                     parents.push(comment.id);
-                    comment = comment.replies[0].data.children[0].data;
+                    comment = comment.replies.data.children[0].data;
                 } while (child.id !== parentId);
                 pc.push.apply();
             });
@@ -142,7 +142,7 @@ liveComments.Comment.prototype.fetchParent = function(event) {
             } else {
                 parentEl.style.height = initialHeight + 'px';
             }
-            
+
             parentEl.classList.remove('shifted-left');
             el.style.position = 'absolute';
         }

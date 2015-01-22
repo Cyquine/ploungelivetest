@@ -275,9 +275,10 @@ time {
 .unloadable::after, .unloadable::before {
     content: "";
     position: absolute;
-    margin: -2px -8px;
+    margin: -2px -12px;
     height: 4px;
-    width: 16px;    
+    width: 24px;
+    background-color: #c84;
 }
 
 .unloadable::after {

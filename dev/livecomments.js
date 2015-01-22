@@ -84,7 +84,7 @@ window.liveComments = {
             params.before = 't1_' + list.comments[0];
         });
     },
-    load: function(event, handler) {
+    load: function(event, handler, opt_unload) {
         event.preventDefault();
         var el = event.target;
         el.disabled = true;
@@ -94,11 +94,18 @@ window.liveComments = {
         el.appendChild(loadingSegs);
         el.classList.add('loading');
 
-        handler();
+        if (opt_unload === false) {
+            handler(unload);
+        } else {
+            handler();
+            unload();
+        }
 
-        el.classList.remove('loading');
-        el.removeChild(loadingSegs);
-        el.disabled = false;
+        function unload() {
+            el.classList.remove('loading');
+            el.removeChild(loadingSegs);
+            el.disabled = false;
+        }
     },
     listComments: function() {
         var comments = liveComments.listComments.comments;
@@ -111,8 +118,9 @@ window.liveComments = {
         for (var i = 0; i < comments.length; i++) {
             var comment = liveComments.loadedComments[comments[i]];
             var el = comment.createSubmission();
+            comment.disableChild(el.lastChild.firstChild);
             wrapper.appendChild(el);
-            comment.show(el.lastChild.lastChild);
+            comment.setTimestamp(el.lastChild.lastChild);
         }
 
         for (var n = Math.min(comments.length, 3), i = 0; i < n; i++) {
@@ -128,38 +136,6 @@ window.liveComments = {
 
         var hideButton = document.getElementById('hide');
         hideButton.textContent = 'Hide ' + Math.min(listing.children.length, 25);
-        hideButton.className = 'faded-in';
-    },
-    showComments: function() {
-        var comments = liveComments.showComments.comments,
-            lc = liveComments.loadedComments,
-            wrapper = document.getElementById('content');
-        for (var toHide = Math.min(comments.length, 25),
-                 i = 0; i < toHide; i++) {
-            var submission = comments.shift();
-            wrapper.appendChild(submission);
-
-            var comment = submission.lastChild.lastChild;
-            if (comment) {
-                var id = comment.id.split('-', 1)[0];
-                lc[id].show(comment);
-            }
-        }
-
-        var showButton = document.getElementById('show'),
-            hiddenComments = document.getElementById('hidden-comments'),
-            hidden = comments.length;
-        if (hidden === 0) {
-            showButton.className = 'faded-out';
-            hiddenComments.firstChild.nodeValue = 'No hidden comments';
-        } else {
-            showButton.firstChild.nodeValue = 'Show ' + Math.min(hidden, 25);
-            hiddenComments.firstChild.nodeValue = hidden + ' hidden comment' +
-                                                        (hidden > 1 ? 's' : '');
-        }
-
-        var hideButton = document.getElementById('hide');
-        hideButton.firstChild.nodeValue = 'Hide ' + Math.min(wrapper.children.length, 25);
         hideButton.className = 'faded-in';
     },
     hideComments: function() {
@@ -192,7 +168,39 @@ window.liveComments = {
 
         document.getElementById('hidden-comments').firstChild.nodeValue =
                            hidden + ' hidden comment' + (hidden > 1 ? 's' : '');
-    }
+    },
+    showComments: function() {
+        var comments = liveComments.showComments.comments,
+            lc = liveComments.loadedComments,
+            wrapper = document.getElementById('content');
+        for (var toHide = Math.min(comments.length, 25),
+                 i = 0; i < toHide; i++) {
+            var submission = comments.shift();
+            wrapper.appendChild(submission);
+
+            var comment = submission.lastChild.lastChild;
+            if (comment) {
+                var id = comment.id.split('-', 1)[0];
+                lc[id].setTimestamp(comment);
+            }
+        }
+
+        var showButton = document.getElementById('show'),
+            hiddenComments = document.getElementById('hidden-comments'),
+            hidden = comments.length;
+        if (hidden === 0) {
+            showButton.className = 'faded-out';
+            hiddenComments.firstChild.nodeValue = 'No hidden comments';
+        } else {
+            showButton.firstChild.nodeValue = 'Show ' + Math.min(hidden, 25);
+            hiddenComments.firstChild.nodeValue = hidden + ' hidden comment' +
+                                                        (hidden > 1 ? 's' : '');
+        }
+
+        var hideButton = document.getElementById('hide');
+        hideButton.firstChild.nodeValue = 'Hide ' + Math.min(wrapper.children.length, 25);
+        hideButton.className = 'faded-in';
+    }    
 };
 liveComments.listComments.comments = [];
 liveComments.showComments.comments = [];
@@ -201,8 +209,8 @@ document.addEventListener('DOMContentLoaded', function() {
     moreButton.firstChild.nodeValue = 'Loading...';
     moreButton.onclick = liveComments.listComments;
 
-    document.getElementById('show').onclick = liveComments.showComments;
     document.getElementById('hide').onclick = liveComments.hideComments;
+    document.getElementById('show').onclick = liveComments.showComments;
     document.getElementById('content').style.paddingBottom = 
                  document.getElementById('hidden-comments').offsetHeight + 'px';
 

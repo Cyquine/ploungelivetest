@@ -1,6 +1,6 @@
 'use strict';
 liveComments.Submission = function(data) {
-    this.copies = [(function() {
+    this.element = (function() {
         // data from comment has link attributes prefixed with 'link_'
         var prefix = data.name[1] === '1' ? 'link_' : '';
 
@@ -64,28 +64,27 @@ liveComments.Submission = function(data) {
         submission.className = 'submission';
 
         return submission;
-    }).apply(this)];
+    }).apply(this);
+
+    this.copies = [];
 }
 
-liveComments.Submission.prototype.getCopy = function(comment_id) {
+liveComments.Submission.prototype.getCopy = function(commentId) {
         // copies reference element with event listeners
-    var el = this.copies[0];
-    if (el.id) {
-        el = el.cloneNode(true);
-        el.firstChild.firstChild.onclick = this.fetch;
+    var el = this.element.cloneNode(true);
+    el.firstChild.firstChild.onclick = this.fetch;
 
-        var comments = el.lastChild;
-        while (comments.hasChildNodes()) comments.removeChild(comments.firstChild);
+    this.copies.push(el);
 
-        this.copies.push(el);
-    }
-
-    el.id = comment_id + '-s';
+    el.id = commentId;
     return el;
 }
 
 liveComments.Submission.prototype.makeDeleted = function() {
-    for (var i = 0; i < this.copies.length; i++) {
-        this.copies[i].firstChild.lastChild.childNodes[2].classList.add('deleted');
+    function makeDeleted_(el) {
+        el.firstChild.lastChild.childNodes[2].classList.add('deleted');
     }
+    
+    makeDeleted_(this.element);
+    for (var i = 0; i < this.copies.length; i++) makeDeleted_(this.copies[i]);
 }

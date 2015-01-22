@@ -2,10 +2,11 @@
  * https://github.com/necolas/idiomatic-css
  */
 
-/* General selectors */
+/* General */
 
 body {
-    padding: 10px;
+    margin: 0;
+    padding: 0;
     min-width: 450px;
     background-color: #ddf;
     font-family: verdana, arial;
@@ -42,13 +43,21 @@ button::-moz-focus-inner {
     border: 0;
 }
 
+time {
+    vertical-align: middle;
+}
+
 @media all and (max-width: 550px) {
-    p, a, time {
+    p, time, .author {
         font-size: small;
     }
 }
 
-/* Macro elements */ 
+/* Macro elements */
+
+#content {
+    padding: 10px;
+}
 
 #more, #footer {
     width: 100%;
@@ -56,13 +65,20 @@ button::-moz-focus-inner {
 }
 
 #more {
+    position: sticky;
+    top: 0;
+    z-index: 1;
     border: none;
     padding: 5px;
     box-sizing: border-box;
+    box-shadow: 0 0 2px #888;
 }
 
 #footer {
-    margin-top: 10px;
+    position: fixed;
+    bottom: 0;
+    z-index: 1;
+    box-shadow: 0 0 2px #888;
 }
 
 #hidden-comments {
@@ -85,18 +101,30 @@ button::-moz-focus-inner {
 /* Submission */
 
 .submission {
-    margin: 10px 0;
+    margin-bottom: 10px;
     background-color: #eee;
     overflow: hidden;
 }
 
-.sub-header {
-    padding: 10px;
+.submission-header {
+    padding: 5px;
+    min-height: 30px;
+    width: calc(100% - 10px);
+    background-color: #ccc;
 }
 
 .comments {
-    margin: 0 10px 10px 10px;
-    display: flex;
+    position: relative;
+    margin: 10px;
+    min-height: 1px;
+}
+
+.author {
+    vertical-align: middle;
+}
+
+.deleted {
+    text-decoration: line-through;
 }
 
 .submitter {
@@ -110,35 +138,42 @@ button::-moz-focus-inner {
 /* Comment */
 
 .comment {
-    height: 100%;
+    position: relative;
+    left: 0;
+    top: 0;
     width: 100%;
     background-color: #fff;
     overflow: hidden;
-    transition: margin-left 1s, margin-right 1s, height 0.5s;
+    transition: left 1s, height 0.5s 1s;
 }
 
-.comment-fake {
-    width: 100%;
-    transition: margin-left 1s, height 0.5s;
+.shifted-left {
+    left: calc(-100% - 10px);
 }
+
+.shifted-right {
+    left: calc(100% + 10px);
+} 
 
 .comment-header {
-    padding: 10px;
-    width: calc(100% - 20px);
+    padding: 5px;
+    min-height: 30px;
+    width: calc(100% - 10px);
     background-color: #ddd;
 }
 
 .link {
-    margin: 0 0 5px;
+    display: inline;
+    vertical-align: middle;
 }
 
 .permalink {
     float: left;
-    margin: -5px 5px 0 5px;
+    margin: 0 5px;
     display: inline-block;
     height: 30px;
     width: 30px;
-    background-image: url(https://www.redditstatic.com/about/assets/reddit-alien-small.png);
+    background-image: url(//www.redditstatic.com/about/assets/reddit-alien-small.png);
     background-repeat: no-repeat;
     background-size: cover;
     opacity: 0.5;
@@ -149,30 +184,38 @@ button::-moz-focus-inner {
 }
 
 .md {
-    margin: 10px 10px 0;
-    padding-bottom: 10px;
+    padding: 10px;
+}
+
+.md-wrapper {
+    height: 0;
+    transition: height 0.5s;
 }
 
 /* Loading icon */
 
-.load, .unloadable {
+.loader, .unloadable {
     float: left;
-    margin-top: -5px;
     height: 30px;
     width: 30px;
     text-align: center;
+    transition: transform 0.5s;
 }
 
-.load.parent {
+.parent {
     transform: rotate(90deg);
 }
 
-.load.child {
+.child {
     transform: rotate(-90deg);
-    float: right;
 }
 
-.load-segment::after, .load-segment::before, .load::after, .load::before {
+.minimiser {
+    transform: rotate(180deg);
+    transition: transform 0.5s;
+}
+
+.loader::after, .loader::before, .loading-segs::after, .loading-segs::before {
     content: "";
     position: absolute;
     transform-origin: 0 0;
@@ -180,19 +223,7 @@ button::-moz-focus-inner {
     width: 16px;
 }
 
-.load-segment::after {
-    margin-left: -14px;
-    transform: rotate(-45deg);
-}
-
-.load-segment::before {
-    margin-top: -14px;
-    transform: rotate(45deg);
-    animation-delay: 0.25s;
-    -webkit-animation-delay: 0.25s;
-}
-
-.load::after {
+.loader::after {
     margin-left: 14px;
     transform: rotate(135deg);
     background-image: linear-gradient(to right, transparent 25%, #888 25%);
@@ -200,7 +231,7 @@ button::-moz-focus-inner {
     -webkit-animation-delay: -0.5s;
 }
 
-.load::before {
+.loader::before {
     margin-top: 14px;
     transform: rotate(225deg);
     background-color: #888;
@@ -208,7 +239,19 @@ button::-moz-focus-inner {
     -webkit-animation-delay: -0.25s;
 }
 
-.loading::after, .loading::before {
+.loading-segs::after {
+    margin-left: -14px;
+    transform: rotate(-45deg);
+}
+
+.loading-segs::before {
+    margin-top: -14px;
+    transform: rotate(45deg);
+    animation-delay: 0.25s;
+    -webkit-animation-delay: 0.25s;
+}
+
+.loading::after, .loading::before, .loading-segs::after, .loading-segs::before {
     background-color: transparent;
     background-image: linear-gradient(to right, transparent 25%, #888 50%); 
     background-size: 400%;
@@ -232,9 +275,10 @@ button::-moz-focus-inner {
 .unloadable::after, .unloadable::before {
     content: "";
     position: absolute;
-    margin: -2px -8px;
+    margin: -2px -12px;
     height: 4px;
-    width: 16px;    
+    width: 24px;
+    background-color: #c84;
 }
 
 .unloadable::after {
@@ -256,21 +300,4 @@ button::-moz-focus-inner {
 .faded-in {
     opacity: 1;
     transition: opacity 0.25s;
-}
-
-.shifted-left, .shifted-right {
-    height: 0;
-    overflow: hidden;
-}
-
-.shifted-left {
-    margin-left: calc(-100% - 10px);
-    margin-right: 10px;
-    transition: margin-left 1s;
-}
-
-.shifted-right {
-    margin-left: 10px;
-    margin-right: calc(-100% - 10px);
-    transition: margin-right 1s;
 }

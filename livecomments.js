@@ -32,7 +32,7 @@ window.liveComments = {
                                setTimeout(liveComments.getReddit.bind(null, url,
                                                     callback, tries + 1), 2000);
                 }
-            }
+            };
 
             request.onerror = function() {
                 liveComments.nextCallTimeout =
@@ -81,9 +81,9 @@ window.liveComments = {
                     lc[comment.id] = new liveComments.Comment(comment);
                     list.comments.unshift(comment.id);
 
-                    var link_id = comment.link_id.slice(3);
-                    if (!ls[link_id]) {
-                        ls[link_id] = new liveComments.Submission(comment);
+                    var linkId = comment.link_id.slice(3);
+                    if (!ls[linkId]) {
+                        ls[linkId] = new liveComments.Submission(comment);
                     }
                 }
             }

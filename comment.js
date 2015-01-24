@@ -9,73 +9,68 @@ liveComments.Comment = function(data, opt_submitter) {
                            [data.id, data.parent_id.slice(3)] : [data.id, ''];
     }
 
-    this.element = (function() {
-        var loadParent = document.createElement('button');
-        loadParent.className = 'parent loader';
-        loadParent.onclick = this.fetchParent;
+    var loadParent = document.createElement('button');
+    loadParent.className = 'parent loader';
+    loadParent.onclick = this.fetchParent;
 
-        var minimiser = document.createElement('button');
-        minimiser.className = 'minimiser loader';
-        minimiser.onclick = this.minimise;
+    var minimiser = document.createElement('button');
+    minimiser.className = 'minimiser loader';
+    minimiser.onclick = this.minimise;
 
-        var loadChild = document.createElement('button');
-        loadChild.className = 'child loader';
-        loadChild.onclick = this.fetchChild;
+    var loadChild = document.createElement('button');
+    loadChild.className = 'child loader';
+    loadChild.onclick = this.fetchChild;
 
-        var permalink = document.createElement('a');
-        permalink.className = 'permalink';
-        permalink.target = '_blank';
-        permalink.href = '//www.reddit.com/r/' + data.subreddit + '/comments/' +
-                            data.link_id.slice(3) + '/x/' + data.id;
+    var permalink = document.createElement('a');
+    permalink.className = 'permalink';
+    permalink.target = '_blank';
+    permalink.href = '//www.reddit.com/r/' + data.subreddit + '/comments/' +
+                        data.link_id.slice(3) + '/x/' + data.id;
 
-        var author;
-        if (data.author === '[deleted]') {
-            author = document.createElement('p');
-            author.className = 'author';
-        } else {
-            author = document.createElement('a');
-            author.href = '//reddit.com/u/' + data.author;
-            author.target = '_blank';
-            author.className = 'author' + (data.author === (opt_submitter ||
-                                data.link_author) ? ' submitter' : '');
-        }
-        author.appendChild(document.createTextNode(data.author));
+    var author;
+    if (data.author === '[deleted]') {
+        author = document.createElement('p');
+        author.className = 'author';
+    } else {
+        author = document.createElement('a');
+        author.href = '//reddit.com/u/' + data.author;
+        author.target = '_blank';
+        author.className = 'author' + (data.author === (opt_submitter ||
+                            data.link_author) ? ' submitter' : '');
+    }
+    author.appendChild(document.createTextNode(data.author));
 
-        var created = document.createElement('time'),
-            createdTime = new Date(this.created);
-        created.appendChild(document.createTextNode(''));
-        created.className = 'created';
-        created.datetime = createdTime.toISOString();
-        created.title = createdTime.toString();
+    var created = document.createElement('time'),
+        createdTime = new Date(this.created);
+    created.appendChild(document.createTextNode(''));
+    created.className = 'created';
+    created.datetime = createdTime.toISOString();
+    created.title = createdTime.toString();
 
-        var header = document.createElement('div');
-        header.appendChild(loadParent);
-        header.appendChild(minimiser);
-        header.appendChild(loadChild);
-        header.appendChild(permalink);
-        header.appendChild(author);
-        header.appendChild(created);
-        header.className = 'comment-header';
+    var header = document.createElement('div');
+    header.appendChild(loadParent);
+    header.appendChild(minimiser);
+    header.appendChild(loadChild);
+    header.appendChild(permalink);
+    header.appendChild(author);
+    header.appendChild(created);
+    header.className = 'comment-header';
 
-        var md = document.createElement('div');
-        md.innerHTML = data.body_html;
-        md.innerHTML = md.firstChild.nodeValue;
-        liveComments.bpm(md);
-        md.className = 'md-wrapper';
-        md.style.height = 'auto';
+    var md = document.createElement('div');
+    md.innerHTML = data.body_html;
+    md.innerHTML = md.firstChild.nodeValue;
+    liveComments.bpm(md);
+    md.className = 'md-wrapper';
+    md.style.height = 'auto';
 
-        var comment = document.createElement('div');
-        comment.appendChild(header);
-        comment.appendChild(md);
-        comment.className = 'comment';
-
-        return comment;
-    }).apply(this);
-}
+    this.element = document.createElement('div');
+    this.element.appendChild(header);
+    this.element.appendChild(md);
+    this.element.className = 'comment';
+};
 
 liveComments.Comment.prototype.getCopy = function() {
-    var copyNo = -1;
-    while (this.timestampTimeouts[++copyNo] !== undefined) ;
+    for  (var copyNo = -1; this.timestampTimeouts[++copyNo] !== undefined;) {}
 
     var el = this.element.cloneNode(true),
         header = el.firstChild;
@@ -86,7 +81,7 @@ liveComments.Comment.prototype.getCopy = function() {
     el.id = this.id + '-' + copyNo;
     this.timestampTimeouts[copyNo] = null;
     return el;
-}
+};
 
 liveComments.Comment.prototype.removeCopy = function(el) {
     this.hide(el);
@@ -94,13 +89,13 @@ liveComments.Comment.prototype.removeCopy = function(el) {
 
     var copyNo = el.id.split('-', 2)[1];
     this.timestampTimeouts[copyNo] = null;
-}
+};
 
 liveComments.Comment.prototype.createSubmission = function() {
     var submission = liveComments.loadedSubmissions[this.submission].getCopy(this.id);
     submission.lastChild.appendChild(this.getCopy());
     return submission;
-}
+};
 
 liveComments.Comment.prototype.setTimestamp = function(el) {
     function modDiv(a, b) {return (a-a%b)/b}
@@ -128,12 +123,12 @@ liveComments.Comment.prototype.setTimestamp = function(el) {
                                               (value === 1 ? '' : 's') + ' ago';
     this.timestampTimeouts[copyNo] = setTimeout(this.setTimestamp.bind(this, el),
                                                     (value + 1)*waitUnit - age);
-}
+};
 
 liveComments.Comment.prototype.hide = function(el) {
     var copyNo = el.id.split('-', 2)[1];
     clearTimeout(this.timestampTimeouts[copyNo]);
-}
+};
 
 liveComments.Comment.prototype.fetchParent = function(event) {
     liveComments.load(event, function(unload) {
@@ -243,7 +238,7 @@ liveComments.Comment.prototype.fetchParent = function(event) {
             unload();
         }
     }, false);
-}
+};
 
 liveComments.Comment.prototype.minimise = function(event) {
     event.preventDefault();
@@ -345,10 +340,10 @@ liveComments.Comment.prototype.fetchChild = function(event) {
             }, 0);
         });
     }
-}
+};
 
 liveComments.Comment.prototype.disableChild = function(el) {
     var loadChild = el.firstChild.childNodes[2];
     loadChild.className = 'unloadable';
     loadChild.onclick = null;
-}
+};

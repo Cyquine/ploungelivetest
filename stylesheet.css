@@ -74,6 +74,12 @@ time {
     box-shadow: 0 0 2px #888;
 }
 
+#more.error {
+    background-color: #c84;
+    color: #fff;
+    font-weight: bold;
+}
+
 #footer {
     position: fixed;
     bottom: 0;
@@ -121,6 +127,10 @@ time {
 
 .author {
     vertical-align: middle;
+}
+
+p.author {
+    display: inline;
 }
 
 .deleted {

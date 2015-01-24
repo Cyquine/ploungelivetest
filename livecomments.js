@@ -5,7 +5,7 @@ window.liveComments = {
     lastCall: 0,
     nextCallTimeout: null,
     queries: {},
-    getReddit: function(url, callback) {
+    getReddit: function(url, callback, tries) {
         clearTimeout(liveComments.nextCallTimeout);
 
         var delay;
@@ -13,25 +13,31 @@ window.liveComments = {
             setTimeout(liveComments.getReddit, delay, url, callback);
         } else {
             var request = new XMLHttpRequest();
-            
+
             request.onload = function() {
                 liveComments.lastCall = Date.now();
                 if (request.status >= 200 && request.status < 400) {
                     liveComments.nextCallTimeout =
                                      setTimeout(liveComments.getComments, 2000);
-                    callback(JSON.parse(request.response));
-                    return 0;
+                    callback('success', JSON.parse(request.response));
                 } else {
+                    if (tries === 3) {
+                        liveComments.nextCallTimeout =
+                                     setTimeout(liveComments.getComments, 2000);
+                        callback('timeout');
+                        return;
+                    }
+                    if (!tries) tries = 0;
                     liveComments.nextCallTimeout =
-                       setTimeout(liveComments.getReddit.bind(null, url), 2000);
-                    return 1;
+                               setTimeout(liveComments.getReddit.bind(null, url,
+                                                    callback, tries + 1), 2000);
                 }
             }
 
             request.onerror = function() {
                 liveComments.nextCallTimeout =
-                       setTimeout(liveComments.getReddit.bind(null, url), 2000);
-                return 2;
+                                     setTimeout(liveComments.getComments, 2000);
+                callback('failure');
             };
 
             request.open('GET', url);
@@ -45,8 +51,23 @@ window.liveComments = {
             paramArray.push(p + '=' + params[p]);
         }
 
-        liveComments.getReddit('https://www.reddit.com/r/' + liveComments.queries.subreddit +
-                  '/comments.json?' + paramArray.join('&'), function(data) {
+        liveComments.getReddit('https://www.reddit.com/r/' +
+                            liveComments.queries.subreddit + '/comments.json?' +
+                                  paramArray.join('&'), function(status, data) {
+            if (status !== 'success') {
+                var moreButton = document.getElementById('more'),
+                    message = status === 'failure' ?
+                          'Please check connection' : 'Cannot reach reddit';
+                if (moreButton.className === 'faded-in') {
+                    moreButton.firstChild.nodeValue += ' (' + message + ')';
+                    moreButton.className = 'error';
+                } else if (!moreButton.classList.contains('error')) {
+                    moreButton.firstChild.nodeValue = message;
+                    moreButton.className = 'faded-in error';
+                }
+                return;
+            }
+
             if (data.data.children.length === 0) return;
 
             var list = liveComments.listComments;
@@ -113,6 +134,7 @@ window.liveComments = {
 
         document.getElementById('more').className = 'faded-out';
         document.title = 'comments: ' + liveComments.queries.subreddit;
+        window.scroll(0, 0);
 
         var wrapper = document.createDocumentFragment();
         for (var i = 0; i < comments.length; i++) {
@@ -200,7 +222,7 @@ window.liveComments = {
         var hideButton = document.getElementById('hide');
         hideButton.firstChild.nodeValue = 'Hide ' + Math.min(wrapper.children.length, 25);
         hideButton.className = 'faded-in';
-    }    
+    }
 };
 liveComments.listComments.comments = [];
 liveComments.showComments.comments = [];
@@ -211,7 +233,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
     document.getElementById('hide').onclick = liveComments.hideComments;
     document.getElementById('show').onclick = liveComments.showComments;
-    document.getElementById('content').style.paddingBottom = 
+    document.getElementById('content').style.paddingBottom =
                  document.getElementById('hidden-comments').offsetHeight + 'px';
 
     var queries = liveComments.queries;
@@ -220,7 +242,7 @@ document.addEventListener('DOMContentLoaded', function() {
         var pair = queryString[i].split('=');
         queries[pair[0]] = pair[1];
     }
-    queries.subreddit = queries.subreddit || 'MLPLounge';
+    if (!queries.subreddit) queries.subreddit = 'MLPLounge';
     document.title = 'comments: ' + queries.subreddit;
 
     liveComments.getComments.params = {'before': ''};

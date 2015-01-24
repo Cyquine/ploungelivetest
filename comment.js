@@ -21,11 +21,11 @@ liveComments.Comment = function(data, opt_submitter) {
         var loadChild = document.createElement('button');
         loadChild.className = 'child loader';
         loadChild.onclick = this.fetchChild;
-        
+
         var permalink = document.createElement('a');
         permalink.className = 'permalink';
         permalink.target = '_blank';
-        permalink.href = '//www.reddit.com/r/' + data.subreddit + '/comments/' +
+        permalink.href = '//reddit.com/r/' + data.subreddit + '/comments/' +
                             data.link_id.slice(3) + '/x/' + data.id;
 
         var author;
@@ -34,7 +34,7 @@ liveComments.Comment = function(data, opt_submitter) {
             author.className = 'author';
         } else {
             author = document.createElement('a');
-            author.href = '//www.reddit.com/u/' + data.author;
+            author.href = '//reddit.com/u/' + data.author;
             author.target = '_blank';
             author.className = 'author' + (data.author === (opt_submitter ||
                                 data.link_author) ? ' submitter' : '');
@@ -149,7 +149,22 @@ liveComments.Comment.prototype.fetchParent = function(event) {
         if (parentId && !parent) {
             var link = el.firstChild.childNodes[3].href;
             liveComments.getReddit(link.slice(0, link.lastIndexOf('/') + 1) +
-                                  parentId + '.json?context=8', function(data) {
+                          parentId + '.json?context=8', function(status, data) {
+                if (status !== 'success') {
+                    var moreButton = document.getElementById('more'),
+                        message = status === 'failure' ?
+                              'Please check connection' : 'Cannot reach reddit';
+                    if (moreButton.className === 'faded-in') {
+                        moreButton.firstChild.nodeValue += ' (' + message + ')';
+                        moreButton.className = 'error';
+                    } else if (!moreButton.classList.contains('error')) {
+                        moreButton.firstChild.nodeValue = message;
+                        moreButton.className = 'faded-in error';
+                    }
+                    unload();
+                    return;
+                }
+
                 var submitter = data[0].data.children[0].data.author;
                 if (submitter === '[deleted]') {
                     liveComments.loadedSubmissions[data[0].data.id].makeDeleted();
@@ -160,9 +175,10 @@ liveComments.Comment.prototype.fetchParent = function(event) {
                     parents = [comment.parent_id[1] === '1' ?
                                comment.parent_id.slice(3) : ''];
                 do {
-                    lc[comment.id] = new liveComments.Comment(comment, submitter);
                     parents.unshift(comment.id);
-                } while (comment.replies && 
+                    if (lc[comment.id] && lc[comment.id].parentChain) break; // TODO FIX
+                    lc[comment.id] = new liveComments.Comment(comment, submitter);
+                } while (comment.replies &&
                         (comment = comment.replies.data.children[0].data).id !== id);
                 Array.prototype.push.apply(pc, parents.slice(1));
 
@@ -187,8 +203,8 @@ liveComments.Comment.prototype.fetchParent = function(event) {
                 el.offsetHeight; // force reflow
 
                 parentEl.classList.remove('shifted-left');
-                el.classList.add('shifted-right'); /* duplicated from below to
-                                           fire the transitions simultaneously */
+                el.classList.add('shifted-right'); /* duplicated from below
+                                     to fire the transitions simultaneously */
 
                 setTimeout(function() { // allows bpm to fire first
                     var initialHeight = parentEl.offsetHeight;
@@ -202,10 +218,6 @@ liveComments.Comment.prototype.fetchParent = function(event) {
                     } else {
                         parentEl.style.height = initialHeight + 'px';
                     }
-
-                    setTimeout(function() {
-                        parentEl.style.height = '';
-                    }, 1500);
                 }, 0);
             } else {
                 var loadChild = document.createElement('button');
@@ -222,7 +234,7 @@ liveComments.Comment.prototype.fetchParent = function(event) {
             el.offsetHeight; // force reflow
             el.style.height = '0';
 
-            el.classList.add('shifted-right'); 
+            el.classList.add('shifted-right');
 
             setTimeout(function() {
                 thisValue.removeCopy(el);
@@ -259,7 +271,7 @@ liveComments.Comment.prototype.fetchChild = function(event) {
     if (el.classList.contains('submission')) {
         liveComments.load(event, function() {
             event.target.className = 'child loader faded-out';
-            
+
             var lc = liveComments.loadedComments,
                 pc = lc[el.id].parentChain;
             while (pc[pc.length - 1] !== '') pc = lc[pc[pc.length - 1]].parentChain;
@@ -280,7 +292,6 @@ liveComments.Comment.prototype.fetchChild = function(event) {
             setTimeout(function() {
                 el.firstChild.removeChild(event.target);
                 commentEl.classList.remove('md-wrapper');
-                commentEl.style.height = '';
             }, 500);
         }, false);
     } else {
@@ -311,7 +322,8 @@ liveComments.Comment.prototype.fetchChild = function(event) {
             el.style.height = '0';
 
             el.classList.add('shifted-left');
-            childEl.classList.remove('shifted-right');
+            childEl.classList.remove('shifted-right'); /* duplicated from below
+                                         to fire the transitions simultaneously */
 
             setTimeout(function() { // allows bpm to fire first
                 var initialHeight = childEl.offsetHeight;
@@ -325,9 +337,8 @@ liveComments.Comment.prototype.fetchChild = function(event) {
                 } else {
                     childEl.style.height = initialHeight + 'px';
                 }
-                
+
                 setTimeout(function() {
-                    childEl.style.height = '';
                     liveComments.loadedComments[el.id.split('-',
                                                           1)[0]].removeCopy(el);
                 }, 1500);

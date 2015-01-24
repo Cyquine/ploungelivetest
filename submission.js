@@ -21,14 +21,14 @@ liveComments.Submission = function(data) {
         } else {
             author = document.createElement('a');
             author.className = 'author submitter';
-            author.href ='//www.reddit.com/u/' + data[prefix + 'author'];
+            author.href ='//reddit.com/u/' + data[prefix + 'author'];
             author.target = '_blank';
         }
         author.appendChild(document.createTextNode(data[prefix + 'author']));
-        
+
         var subreddit = document.createElement('a');
         subreddit.appendChild(document.createTextNode('/r/' + data.subreddit));
-        subreddit.href = '//www.reddit.com/r/' + data.subreddit;
+        subreddit.href = 'http://reddit.com/r/' + data.subreddit;
         subreddit.target = '_blank';
 
         var link = document.createElement('p');
@@ -45,7 +45,7 @@ liveComments.Submission = function(data) {
         var id = prefix ? data.link_id.slice(3) : data.id;
         if (data.is_self === false || title.pathname.lastIndexOf('/r/' +
                 data.subreddit + '/comments/' + id) !== 0) {
-            var permalink = document.createElement('a');            
+            var permalink = document.createElement('a');
             permalink.className = 'permalink';
             permalink.href = '//redd.it/' + id;
             permalink.target = '_blank';
@@ -84,7 +84,7 @@ liveComments.Submission.prototype.makeDeleted = function() {
     function makeDeleted_(el) {
         el.firstChild.lastChild.childNodes[2].classList.add('deleted');
     }
-    
+
     makeDeleted_(this.element);
     for (var i = 0; i < this.copies.length; i++) makeDeleted_(this.copies[i]);
 }

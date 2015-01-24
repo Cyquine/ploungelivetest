@@ -5,12 +5,13 @@ window.liveComments = {
     lastCall: 0,
     nextCallTimeout: null,
     queries: {},
-    getReddit: function(url, callback, tries) {
+    getReddit: function(url, onSuccess, onFailure, tries) {
         clearTimeout(liveComments.nextCallTimeout);
 
         var delay;
         if ((delay = Date.now() - liveComments.lastCall - 2000) < 0) {
-            setTimeout(liveComments.getReddit, delay, url, callback);
+            setTimeout(liveComments.getReddit, delay, url, onSuccess, onFailure,
+                                                                         tries);
         } else {
             var request = new XMLHttpRequest();
 
@@ -19,25 +20,44 @@ window.liveComments = {
                 if (request.status >= 200 && request.status < 400) {
                     liveComments.nextCallTimeout =
                                      setTimeout(liveComments.getComments, 2000);
-                    callback('success', JSON.parse(request.response));
+                    onSuccess(JSON.parse(request.response));
                 } else {
                     if (tries === 3) {
+                        var moreButton = document.getElementById('more');
+                        if (moreButton.className === 'faded-in') {
+                            moreButton.firstChild.data += ' (Cannot reach reddit)';
+                            moreButton.className = 'error';
+                        } else if (!moreButton.classList.contains('error')) {
+                            moreButton.firstChild.data = 'Cannot reach reddit';
+                            moreButton.className = 'faded-in error';
+                        }
+
                         liveComments.nextCallTimeout =
                                      setTimeout(liveComments.getComments, 2000);
-                        callback('timeout');
+                        onFailure();
                         return;
                     }
                     if (!tries) tries = 0;
                     liveComments.nextCallTimeout =
-                               setTimeout(liveComments.getReddit.bind(null, url,
-                                                    callback, tries + 1), 2000);
+                               setTimeout(liveComments.getReddit, 2000, url,
+                                               onSuccess, onFailure, tries + 1);
                 }
             };
 
             request.onerror = function() {
                 liveComments.nextCallTimeout =
                                      setTimeout(liveComments.getComments, 2000);
-                callback('failure');
+
+                var moreButton = document.getElementById('more');
+                if (moreButton.className === 'faded-in') {
+                    moreButton.firstChild.data += ' (Please check connection)';
+                    moreButton.className = 'error';
+                } else if (!moreButton.classList.contains('error')) {
+                    moreButton.firstChild.data = 'Please check connection';
+                    moreButton.className = 'faded-in error';
+                }
+
+                onFailure();
             };
 
             request.open('GET', url);
@@ -53,21 +73,7 @@ window.liveComments = {
 
         liveComments.getReddit('https://www.reddit.com/r/' +
                             liveComments.queries.subreddit + '/comments.json?' +
-                                  paramArray.join('&'), function(status, data) {
-            if (status !== 'success') {
-                var moreButton = document.getElementById('more'),
-                    message = status === 'failure' ?
-                          'Please check connection' : 'Cannot reach reddit';
-                if (moreButton.className === 'faded-in') {
-                    moreButton.firstChild.nodeValue += ' (' + message + ')';
-                    moreButton.className = 'error';
-                } else if (!moreButton.classList.contains('error')) {
-                    moreButton.firstChild.nodeValue = message;
-                    moreButton.className = 'faded-in error';
-                }
-                return;
-            }
-
+                                          paramArray.join('&'), function(data) {
             if (data.data.children.length === 0) return;
 
             var list = liveComments.listComments;
@@ -98,7 +104,7 @@ window.liveComments = {
                 moreButton.className = 'faded-in';
 
                 var message = nc + ' new comment' + (nc === 1 ? '' : 's');
-                moreButton.firstChild.nodeValue = message;
+                moreButton.firstChild.data = message;
 
                 document.title = message + ': ' + liveComments.queries.subreddit;
             }
@@ -131,6 +137,8 @@ window.liveComments = {
     listComments: function() {
         var comments = liveComments.listComments.comments;
         liveComments.listComments.comments = [];
+
+        if (comments.length === 0) return;
 
         document.getElementById('more').className = 'faded-out';
         document.title = 'comments: ' + liveComments.queries.subreddit;
@@ -181,15 +189,15 @@ window.liveComments = {
             hideButton = document.getElementById('hide'),
             hidden = comments.length;
 
-        showButton.firstChild.nodeValue = 'Show ' + Math.min(hidden, 25);
+        showButton.firstChild.data = 'Show ' + Math.min(hidden, 25);
         showButton.className = 'faded-in';
 
         if (wrapper.children.length === 0) hideButton.className = 'faded-out';
-        else hideButton.firstChild.nodeValue = 'Hide ' +
+        else hideButton.firstChild.data = 'Hide ' +
                                           Math.min(wrapper.children.length, 25);
 
-        document.getElementById('hidden-comments').firstChild.nodeValue =
-                           hidden + ' hidden comment' + (hidden > 1 ? 's' : '');
+        document.getElementById('hidden-comments').firstChild.data = hidden +
+                                    ' hidden comment' + (hidden > 1 ? 's' : '');
     },
     showComments: function() {
         var comments = liveComments.showComments.comments,
@@ -212,15 +220,15 @@ window.liveComments = {
             hidden = comments.length;
         if (hidden === 0) {
             showButton.className = 'faded-out';
-            hiddenComments.firstChild.nodeValue = 'No hidden comments';
+            hiddenComments.firstChild.data = 'No hidden comments';
         } else {
-            showButton.firstChild.nodeValue = 'Show ' + Math.min(hidden, 25);
-            hiddenComments.firstChild.nodeValue = hidden + ' hidden comment' +
+            showButton.firstChild.data = 'Show ' + Math.min(hidden, 25);
+            hiddenComments.firstChild.data = hidden + ' hidden comment' +
                                                         (hidden > 1 ? 's' : '');
         }
 
         var hideButton = document.getElementById('hide');
-        hideButton.firstChild.nodeValue = 'Hide ' + Math.min(wrapper.children.length, 25);
+        hideButton.firstChild.data = 'Hide ' + Math.min(wrapper.children.length, 25);
         hideButton.className = 'faded-in';
     }
 };
@@ -228,7 +236,7 @@ liveComments.listComments.comments = [];
 liveComments.showComments.comments = [];
 document.addEventListener('DOMContentLoaded', function() {
     var moreButton = document.getElementById('more');
-    moreButton.firstChild.nodeValue = 'Loading...';
+    moreButton.firstChild.data = 'Loading...';
     moreButton.onclick = liveComments.listComments;
 
     document.getElementById('hide').onclick = liveComments.hideComments;

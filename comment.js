@@ -58,7 +58,7 @@ liveComments.Comment = function(data, opt_submitter) {
 
     var md = document.createElement('div');
     md.innerHTML = data.body_html;
-    md.innerHTML = md.firstChild.nodeValue;
+    md.innerHTML = md.firstChild.data;
     liveComments.bpm(md);
     md.className = 'md-wrapper';
     md.style.height = 'auto';
@@ -113,13 +113,13 @@ liveComments.Comment.prototype.setTimestamp = function(el) {
         unit = ' minute';
         waitUnit = 60000;
     } else {
-        el.firstChild.childNodes[5].firstChild.nodeValue = 'just now';
+        el.firstChild.childNodes[5].firstChild.data = 'just now';
         this.timestampTimeouts[copyNo] = setTimeout(this.setTimestamp.bind(this,
                                                               el), 60000 - age);
         return;
     }
 
-    el.firstChild.childNodes[5].firstChild.nodeValue = value + unit +
+    el.firstChild.childNodes[5].firstChild.data = value + unit +
                                               (value === 1 ? '' : 's') + ' ago';
     this.timestampTimeouts[copyNo] = setTimeout(this.setTimestamp.bind(this, el),
                                                     (value + 1)*waitUnit - age);
@@ -144,22 +144,7 @@ liveComments.Comment.prototype.fetchParent = function(event) {
         if (parentId && !parent) {
             var link = el.firstChild.childNodes[3].href;
             liveComments.getReddit(link.slice(0, link.lastIndexOf('/') + 1) +
-                          parentId + '.json?context=8', function(status, data) {
-                if (status !== 'success') {
-                    var moreButton = document.getElementById('more'),
-                        message = status === 'failure' ?
-                              'Please check connection' : 'Cannot reach reddit';
-                    if (moreButton.className === 'faded-in') {
-                        moreButton.firstChild.nodeValue += ' (' + message + ')';
-                        moreButton.className = 'error';
-                    } else if (!moreButton.classList.contains('error')) {
-                        moreButton.firstChild.nodeValue = message;
-                        moreButton.className = 'faded-in error';
-                    }
-                    unload();
-                    return;
-                }
-
+                                  parentId + '.json?context=8', function(data) {
                 var submitter = data[0].data.children[0].data.author;
                 if (submitter === '[deleted]') {
                     liveComments.loadedSubmissions[data[0].data.id].makeDeleted();
@@ -179,7 +164,7 @@ liveComments.Comment.prototype.fetchParent = function(event) {
 
                 moveEls.call(thisValue, el,
                                  liveComments.loadedComments[parentId], unload);
-            });
+            }, unload);
         } else {
             moveEls.call(thisValue, el, parent, unload);
         }
@@ -201,7 +186,7 @@ liveComments.Comment.prototype.fetchParent = function(event) {
                 el.classList.add('shifted-right'); /* duplicated from below
                                      to fire the transitions simultaneously */
 
-                setTimeout(function() { // allows bpm to fire first
+                setTimeout(function() { // allow bpm to fire first
                     var initialHeight = parentEl.offsetHeight;
                     parentEl.style.height = el.offsetHeight + 'px';
                     wrapper.style.height = '';
@@ -246,7 +231,9 @@ liveComments.Comment.prototype.minimise = function(event) {
     el.disabled = true;
     el.classList.toggle('minimiser');
 
-    var md = event.target.parentNode.nextSibling;
+    el.parentNode.parentNode.style.height = '';
+
+    var md = el.parentNode.nextSibling;
     if (el.classList.contains('minimiser')) {
         md.style.height = md.scrollHeight + 'px';
     } else {
@@ -283,11 +270,14 @@ liveComments.Comment.prototype.fetchChild = function(event) {
             commentEl.classList.add('md-wrapper');
             commentEl.style.height = '0';
             wrapper.appendChild(commentEl);
-            commentEl.style.height = commentEl.scrollHeight + 'px';
-            setTimeout(function() {
-                el.firstChild.removeChild(event.target);
-                commentEl.classList.remove('md-wrapper');
-            }, 500);
+
+            setTimeout(function() { // allow bpm to fire first
+                commentEl.style.height = commentEl.scrollHeight + 'px';
+                setTimeout(function() {
+                    el.firstChild.removeChild(event.target);
+                    commentEl.classList.remove('md-wrapper');
+                }, 500);
+            }, 0);
         }, false);
     } else {
         liveComments.load(event, function(unload) {
@@ -320,7 +310,7 @@ liveComments.Comment.prototype.fetchChild = function(event) {
             childEl.classList.remove('shifted-right'); /* duplicated from below
                                          to fire the transitions simultaneously */
 
-            setTimeout(function() { // allows bpm to fire first
+            setTimeout(function() { // allow bpm to fire first
                 var initialHeight = childEl.offsetHeight;
                 childEl.style.height = el.offsetHeight + 'px';
                 wrapper.style.height = '';

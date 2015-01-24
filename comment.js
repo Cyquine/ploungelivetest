@@ -25,7 +25,7 @@ liveComments.Comment = function(data, opt_submitter) {
         var permalink = document.createElement('a');
         permalink.className = 'permalink';
         permalink.target = '_blank';
-        permalink.href = '//reddit.com/r/' + data.subreddit + '/comments/' +
+        permalink.href = '//www.reddit.com/r/' + data.subreddit + '/comments/' +
                             data.link_id.slice(3) + '/x/' + data.id;
 
         var author;

@@ -30,7 +30,7 @@ liveComments.bpm = function(node) { // borrows heavily from bpm's mechanism
     }
 };
 // Edited from bpm:                      <  emote   >   <    alt-text     >
-liveComments.bpm.emoteRegexp = /(\[\]\(\/[\w:!#\/\-]+\s*(?:["'][^"]*["'])?)\)/g;
+liveComments.bpm.emoteRegexp = /(\[\]\(\/[\w:!#\/\-]+\s*(?:["'][^"]*["'])?)\)/;
 
 liveComments.bpm.enabled = false;
 liveComments.bpm.toggle = function() {

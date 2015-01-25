@@ -27,7 +27,7 @@ liveComments.Submission = function(data) {
 
     var subreddit = document.createElement('a');
     subreddit.appendChild(document.createTextNode('/r/' + data.subreddit));
-    subreddit.href = 'http://reddit.com/r/' + data.subreddit;
+    subreddit.href = '//reddit.com/r/' + data.subreddit;
     subreddit.target = '_blank';
 
     var link = document.createElement('p');
@@ -46,7 +46,7 @@ liveComments.Submission = function(data) {
             data.subreddit + '/comments/' + id) !== 0) {
         var permalink = document.createElement('a');
         permalink.className = 'permalink';
-        permalink.href = '//redd.it/' + id;
+        permalink.href = 'http://redd.it/' + id;
         permalink.target = '_blank';
         header.appendChild(permalink);
     }
